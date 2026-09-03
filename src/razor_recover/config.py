@@ -25,7 +25,9 @@ class Settings(BaseSettings):
     debug: bool = False
 
     # PostgreSQL
-    database_url: str = "postgresql://user:password@localhost:5432/razor_recover"
+    database_url: str = (
+        "postgresql+psycopg://razor:razor_dev_password@localhost:5433/razorrecover"
+    )
 
     # Redis
     redis_url: str = "redis://localhost:6379/0"
