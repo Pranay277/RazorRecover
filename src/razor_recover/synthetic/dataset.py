@@ -71,13 +71,12 @@ def generate_dataset(
         timestamp = _timestamp_ago(rng)
 
         failure_code, failure_reason = failure_gen.generate()
+        amount = amount_gen.generate(currency)
+        payment_method = rng.choice(c.PAYMENT_METHODS)
+        gateway = rng.choice(c.GATEWAYS)
 
         # Non-uniform attempt counts: 1 attempt is most common, more are rarer.
         attempt_number = int(rng.choices([1, 2, 3, 4], weights=[60, 25, 10, 5], k=1)[0])
-
-        # Whether this payment is eventually recovered drives both the decision
-        # outcome and the final attempt status (recovery outcome consistency).
-        recovered = _decide_recovery(rng, attempt_number)
 
         # Derive historical behavior from that customer's prior transactions.
         prior = by_customer[customer.external_id]
@@ -89,15 +88,27 @@ def generate_dataset(
             ),
         )
 
+        # Whether this payment is eventually recovered drives both the decision
+        # outcome and the final attempt status (recovery outcome consistency).
+        # The outcome is a realistic function of information available at
+        # evaluation time (failure category, customer history, amount, gateway,
+        # payment method) plus more attempts => more chances. It deliberately
+        # does NOT depend only on the leaked attempt count, so a non-leaky ML
+        # model trained on evaluation-time features has genuine signal.
+        recovered = _decide_recovery(
+            rng, attempt_number, failure_code, history, float(amount), gateway,
+            payment_method,
+        )
+
         tx_external_id = f"tx_{i:06d}"
         transaction = SyntheticTransaction(
             external_id=tx_external_id,
             customer_external_id=customer.external_id,
             merchant_external_id=merchant.external_id,
-            amount=amount_gen.generate(currency),
+            amount=amount,
             currency=currency,
-            payment_method=rng.choice(c.PAYMENT_METHODS),
-            gateway=rng.choice(c.GATEWAYS),
+            payment_method=payment_method,
+            gateway=gateway,
             timestamp=timestamp,
             failure_code=failure_code,
             failure_reason=failure_reason,
@@ -146,10 +157,68 @@ def generate_dataset(
     )
 
 
-def _decide_recovery(rng: random.Random, attempt_number: int) -> bool:
-    # More attempts increase the chance a recovery actually succeeds.
-    base_chance = {1: 0.40, 2: 0.55, 3: 0.70, 4: 0.80}.get(attempt_number, 0.60)
-    return rng.random() < base_chance
+# Base (unconditional) recovery likelihood per failure category. Higher values
+# mean the failure is "easier" to recover by retrying / asking for a new card;
+# hard-decline categories (insufficient_funds, bank_declined) are harder.
+_RECOVERY_BASE_RATE: dict[str, float] = {
+    "network_timeout": 0.70,
+    "gateway_error": 0.65,
+    "expired_card": 0.60,
+    "authentication_failed": 0.55,
+    "limit_exceeded": 0.50,
+    "unknown": 0.45,
+    "bank_declined": 0.38,
+    "insufficient_funds": 0.30,
+}
+
+# Small, fixed per-gateway recovery adjustment (gateway reliability).
+_GATEWAY_EFFECT: dict[str, float] = {
+    "stripe": 0.05, "adyen": 0.04, "braintree": 0.02, "razorpay": 0.03,
+    "paypal": 0.00, "worldpay": -0.02, "chase": -0.04, "barclays": -0.05,
+}
+
+# Small per-payment-method recovery adjustment.
+_PAYMENT_METHOD_EFFECT: dict[str, float] = {
+    "card": 0.03, "wallet": 0.02, "upi": 0.00, "bank_transfer": -0.03,
+}
+
+
+def _decide_recovery(
+    rng: random.Random,
+    attempt_number: int,
+    failure_code: str,
+    history,
+    amount: float,
+    gateway: str,
+    payment_method: str,
+) -> bool:
+    """Decide whether a failed payment is eventually recovered.
+
+    The outcome depends on information available at evaluation time (failure
+    category, customer history, amount, gateway, payment method) plus the fact
+    that more attempts give more chances. Only the seeded ``rng`` introduces
+    stochasticity, keeping generation fully reproducible.
+    """
+    base = _RECOVERY_BASE_RATE.get(failure_code, 0.45)
+
+    # More attempts => more chances to eventually recover.
+    chance = base + (attempt_number - 1) * 0.08
+
+    # Customers with a stronger prior success history are easier to recover.
+    n_prev = history.previous_successful_count + history.previous_failed_count
+    if n_prev > 0:
+        ratio = history.previous_successful_count / n_prev
+        chance += (ratio - 0.5) * 0.30
+
+    # Larger amounts are slightly harder to recover.
+    chance -= min(0.12, amount / 2500.0)
+
+    # Gateway / payment method reliability modifiers.
+    chance += _GATEWAY_EFFECT.get(gateway, 0.0)
+    chance += _PAYMENT_METHOD_EFFECT.get(payment_method, 0.0)
+
+    chance = max(0.05, min(0.92, chance))
+    return rng.random() < chance
 
 
 def _choose_action(rng: random.Random, failure_code: str) -> str:
