@@ -1,0 +1,26 @@
+# RazorRecover dependencies
+# Placeholder - actual dependencies will be added during implementation.
+fastapi
+uvicorn[standard]
+
+pydantic
+pydantic-settings
+
+sqlalchemy
+psycopg[binary]
+
+redis
+celery
+
+numpy
+pandas
+scikit-learn
+scipy
+joblib
+
+qdrant-client
+
+httpx
+ollama
+python-dotenv
+tenacity

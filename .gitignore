@@ -1,0 +1,80 @@
+# =============================================================================
+# RazorRecover .gitignore
+# Stack: Python 3.12, FastAPI, SQLAlchemy/Alembic, PostgreSQL, Redis, Qdrant,
+#        Ollama, scikit-learn/ML, Jupyter, Docker, VS Code, Windows + WSL, pytest
+# =============================================================================
+
+# ------------------------- Python -------------------------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# ------------------------- Virtual environments -----------------------------
+.venv/
+venv/
+env/
+Razor/
+*.venv/
+.conda/
+.python-version
+
+# ------------------------- Environment / secrets ----------------------------
+.env
+.env.*
+# Keep the example template versioned
+!.env.example
+
+# ------------------------- IDE / editor -------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+# Cursor local settings/metadata
+.cursor/
+.cursorignore
+# Antigravity local workspace metadata
+.antigravity/
+*.code-workspace
+
+# ------------------------- Testing / coverage -------------------------------
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# ------------------------- Jupyter ------------------------------------------
+.ipynb_checkpoints/
+
+# ------------------------- ML / local generated artifacts -------------------
+models/
+*.joblib
+*.pkl
+*.pickle
+
+# ------------------------- Logs ---------------------------------------------
+*.log
+logs/
+
+# ------------------------- OS -----------------------------------------------
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ------------------------- Docker local data --------------------------------
+# Local Docker volumes/data created inside the repository (keep compose/Dockerfile)
+docker-data/
+*.sqlite3
+*.db
+
+# ------------------------- Temporary / generated ----------------------------
+tmp/
+temp/
+*.tmp

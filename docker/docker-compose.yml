@@ -1,0 +1,28 @@
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: razorrecover-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: razorrecover
+      POSTGRES_USER: razor
+      POSTGRES_PASSWORD: razor_dev_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - razorrecover_postgres_data:/var/lib/postgresql/data
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: razorrecover-qdrant
+    restart: unless-stopped
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - razorrecover_qdrant_data:/qdrant/storage
+
+volumes:
+  razorrecover_postgres_data:
+  razorrecover_qdrant_data:
