@@ -8,6 +8,9 @@ pydantic-settings
 
 sqlalchemy
 psycopg[binary]
+alembic
+
+pytest>=8.0
 
 redis
 celery
