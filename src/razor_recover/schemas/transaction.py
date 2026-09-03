@@ -16,6 +16,9 @@ class TransactionBase(BaseModel):
     failure_code: str | None = None
     failure_reason: str | None = None
     attempted_at: datetime | None = None
+    payment_method: str | None = None
+    gateway: str | None = None
+    attempt_number: int = 1
 
 
 class TransactionCreate(TransactionBase):
