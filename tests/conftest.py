@@ -1,12 +1,21 @@
 """Shared pytest fixtures for RazorRecover tests."""
 
 import pytest
-from sqlalchemy import create_engine, text
+from sqlalchemy import BigInteger, create_engine, text
+from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.orm import Session, sessionmaker
 
 from src.razor_recover.config import get_settings
 from src.razor_recover.core.database import Base, get_db
 from src.razor_recover.db import models  # noqa: F401 - register ORM models
+
+
+# SQLite only auto-increments INTEGER PRIMARY KEY (the rowid alias); our models
+# use BigInteger PKs for PostgreSQL. Compile BigInteger as INTEGER on SQLite so
+# in-memory unit/integration tests get functioning autoincrement PKs.
+@compiles(BigInteger, "sqlite")
+def _compile_bigint_sqlite(type_, compiler, **kw):
+    return "INTEGER"
 
 
 @pytest.fixture
