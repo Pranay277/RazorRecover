@@ -54,7 +54,9 @@ coverage.xml
 .ipynb_checkpoints/
 
 # ------------------------- ML / local generated artifacts -------------------
-models/
+# NOTE: anchored to the repo root so it does NOT ignore source dirs that happen
+# to be named "models" (e.g. src/razor_recover/db/models/ which must be tracked).
+/models/
 *.joblib
 *.pkl
 *.pickle

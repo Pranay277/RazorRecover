@@ -35,6 +35,16 @@ class Settings(BaseSettings):
     # Qdrant
     qdrant_url: str = "http://localhost:6333"
 
+    # RAG / knowledge base
+    qdrant_collection: str = "razorrecover_knowledge"
+    rag_default_top_k: int = 5
+
+    # Embedding provider: "hash" (deterministic, local - default for demo/tests)
+    # or "ollama" (remote HTTP provider selected by rag_embedding_model).
+    rag_embedding_provider: str = "hash"
+    rag_embedding_model: str = "nomic-embed-text"
+    rag_embedding_dim: int = 256
+
     # Ollama
     ollama_url: str = "http://localhost:11434"
     ollama_model: str = "llama3:latest"
