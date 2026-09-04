@@ -47,6 +47,11 @@ class TransactionListItem(BaseModel):
     customer_external_id: str | None = None
     merchant_external_id: str | None = None
 
+    # Latest persisted recovery state for the row (None when the transaction
+    # has never passed through the recovery workflow).
+    latest_decision: RecoveryDecisionSummary | None = None
+    latest_attempt: RecoveryAttemptSummary | None = None
+
 
 class TransactionListResponse(BaseModel):
     """Paginated list of transactions with total count for the UI."""
@@ -118,6 +123,38 @@ class RecoveryAttemptRead(BaseModel):
     created_at: datetime
 
 
+class RecoveryDecisionSummary(BaseModel):
+    """Compact view of the most recent decision for a list row (read-only)."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    action: str
+    outcome: str
+    risk_score: Decimal | None = None
+    rationale: str | None = None
+    decided_at: datetime
+
+
+class RecoveryAttemptSummary(BaseModel):
+    """Compact view of the most recent attempt for a list row (read-only)."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    status: str
+    attempt_type: str
+    error_detail: str | None = None
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
+
+
+class ShieldRuleResult(BaseModel):
+    """One persisted shield rule result from an evaluate audit detail."""
+
+    rule: str
+    passed: bool
+    disposition: str | None = None
+
+
 class TransactionDetail(TransactionListItem):
     """Complete persisted view for the transaction-details screen.
 
@@ -130,6 +167,11 @@ class TransactionDetail(TransactionListItem):
     decisions: list[RecoveryDecisionRead] = Field(default_factory=list)
     attempts: list[RecoveryAttemptRead] = Field(default_factory=list)
     audit_logs: list[AuditLogItem] = Field(default_factory=list)
+
+    # Values lifted from the most recent persisted evaluate audit detail.
+    # Both are None when no evaluate has run for this transaction.
+    recovery_probability: float | None = None
+    shield_rule_results: list[ShieldRuleResult] | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -157,6 +199,10 @@ class SummaryResponse(BaseModel):
     recovery_decisions_by_outcome: dict[str, int]
     recovery_decisions_by_action: dict[str, int]
 
+    # Risk buckets computed from persisted decision risk scores
+    # (low < 0.33, medium < 0.66, high >= 0.66, unknown = NULL).
+    recovery_decisions_by_risk_bucket: dict[str, int] = Field(default_factory=dict)
+
     # Monetary aggregates across transactions (as strings to preserve precision).
     failed_amount: str
     recovered_amount: str
@@ -182,6 +228,12 @@ class AuditLogItem(BaseModel):
     occurred_at: datetime
     created_at: datetime
 
+    # First-class views of the persisted detail JSON so the frontend does not
+    # need to dig through the raw dict. All are None when not applicable.
+    llm_requested_action: str | None = None
+    policy_decision: str | None = None
+    execution_status: str | None = None
+
 
 class AuditListResponse(BaseModel):
     """Paginated audit log list."""
@@ -198,7 +250,10 @@ __all__ = [
     "CustomerReference",
     "MerchantReference",
     "RecoveryAttemptRead",
+    "RecoveryAttemptSummary",
     "RecoveryDecisionRead",
+    "RecoveryDecisionSummary",
+    "ShieldRuleResult",
     "SummaryResponse",
     "TransactionDetail",
     "TransactionListItem",
