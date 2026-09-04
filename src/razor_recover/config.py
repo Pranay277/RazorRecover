@@ -49,6 +49,13 @@ class Settings(BaseSettings):
     ollama_url: str = "http://localhost:11434"
     ollama_model: str = "llama3:latest"
 
+    # LLM / decision-agent provider configuration
+    # Provider is "ollama" today; architecture allows others later.
+    llm_provider: str = "ollama"
+    llm_timeout_seconds: float = 60.0
+    llm_temperature: float = 0.2
+    llm_num_predict: int = 800
+
 
 @lru_cache
 def get_settings() -> Settings:
