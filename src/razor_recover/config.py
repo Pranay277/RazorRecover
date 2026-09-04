@@ -56,6 +56,14 @@ class Settings(BaseSettings):
     llm_temperature: float = 0.2
     llm_num_predict: int = 800
 
+    # Policy / Safety Engine - RazorRecover demo defaults (NOT real Razorpay
+    # limits). Merchant-specific values can override these per transaction.
+    policy_version: int = 1
+    policy_default_max_retries: int = 3
+    policy_default_max_risk_score: float = 0.70
+    policy_default_min_recovery_probability: float = 0.30
+    policy_default_high_value_threshold: float = 10_000.0
+
 
 @lru_cache
 def get_settings() -> Settings:
