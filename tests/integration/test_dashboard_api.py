@@ -93,7 +93,14 @@ def _seed(session: Session, *, audits: bool = True, attempts: bool = True,
             AuditLog(
                 transaction_id=tx1.id, actor="recovery.workflow",
                 action="recovery.evaluate:ALLOW",
-                detail='{"policy_decision": "ALLOW", "execution_status": "recovered"}',
+                detail=(
+                    '{"policy_decision": "ALLOW", '
+                    '"execution_status": "recovered", '
+                    '"llm_requested_action": "RETRY_NOW", '
+                    '"recovery_probability": 0.72, '
+                    '"rule_results": [{"rule": "action_allowlist", '
+                    '"passed": true, "disposition": "pass"}]}'
+                ),
                 occurred_at=datetime(2026, 1, 2, tzinfo=timezone.utc)),
             AuditLog(
                 transaction_id=None, actor="system",
@@ -222,6 +229,39 @@ def test_list_transactions_pagination(api):
     assert not set(first) & set(second)
 
 
+def test_list_transactions_exposes_latest_recovery_state(api):
+    session = api._session  # type: ignore[attr-defined]
+    _seed(session)
+    resp = api.get("/api/v1/transactions")
+    body = resp.json()
+    rows = {t["external_id"]: t for t in body["items"]}
+
+    # tx-1 has a decision and an attempt
+    tx1 = rows["tx-1"]
+    assert tx1["latest_decision"]["action"] == "RETRY_NOW"
+    assert tx1["latest_decision"]["outcome"] == "authorized"
+    assert tx1["latest_decision"]["risk_score"] == "0.4000"
+    assert tx1["latest_attempt"]["status"] == "recovered"
+    assert tx1["latest_attempt"]["attempt_type"] == "RETRY_NOW"
+
+    # tx-3 has only a decision (never executed); tx-2 has nothing
+    tx3 = rows["tx-3"]
+    assert tx3["latest_decision"]["action"] == "STOP"
+    assert tx3["latest_decision"]["outcome"] == "blocked"
+    assert tx3["latest_attempt"] is None
+    assert rows["tx-2"]["latest_decision"] is None
+    assert rows["tx-2"]["latest_attempt"] is None
+
+
+def test_list_transactions_empty_recovery_state(api):
+    session = api._session  # type: ignore[attr-defined]
+    _seed(session, decisions=False, attempts=False, audits=False)
+    resp = api.get("/api/v1/transactions")
+    body = resp.json()
+    assert all(t["latest_decision"] is None for t in body["items"])
+    assert all(t["latest_attempt"] is None for t in body["items"])
+
+
 # ---------------------------------------------------------------------------
 # Transaction detail
 # ---------------------------------------------------------------------------
@@ -243,17 +283,36 @@ def test_transaction_detail_includes_nested_records(api):
     # persisted decisions + attempts
     assert len(body["decisions"]) == 1
     assert body["decisions"][0]["action"] == "RETRY_NOW"
+    assert body["decisions"][0]["risk_score"] == "0.4000"
     assert len(body["attempts"]) == 1
     assert body["attempts"][0]["status"] == "recovered"
     # audit logs (transaction + none-scoped) are attached to the detail
     assert len(body["audit_logs"]) == 1
     assert body["audit_logs"][0]["action"] == "recovery.evaluate:ALLOW"
+    # values lifted from the persisted evaluate audit detail
+    assert body["recovery_probability"] == 0.72
+    assert body["shield_rule_results"] == [
+        {"rule": "action_allowlist", "passed": True, "disposition": "pass"}
+    ]
 
 
 def test_transaction_detail_missing_404(api):
     resp = api.get("/api/v1/transactions/999999")
     assert resp.status_code == 404
     assert "does not exist" in resp.json()["detail"]
+
+
+def test_transaction_detail_no_evaluate_meta_is_null(api):
+    session = api._session  # type: ignore[attr-defined]
+    _seed(session, decisions=False, attempts=False, audits=False)
+    tx_id = session.query(Transaction).filter_by(external_id="tx-1").one().id
+    resp = api.get(f"/api/v1/transactions/{tx_id}")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["recovery_probability"] is None
+    assert body["shield_rule_results"] is None
+    assert body["latest_decision"] is None
+    assert body["latest_attempt"] is None
 
 
 # ---------------------------------------------------------------------------
@@ -270,6 +329,9 @@ def test_summary_empty_db(api):
     assert body["recovery_decisions_total"] == 0
     assert body["failed_amount"] == "0.00"
     assert body["recovered_amount"] == "0.00"
+    assert body["recovery_decisions_by_risk_bucket"] == {
+        "low": 0, "medium": 0, "high": 0, "unknown": 0,
+    }
 
 
 def test_summary_metrics_calculated(api):
@@ -294,6 +356,11 @@ def test_summary_metrics_calculated(api):
     assert body["recovery_decisions_by_outcome"]["blocked"] == 1
     assert body["recovery_decisions_by_action"]["RETRY_NOW"] == 1
     assert body["recovery_decisions_by_action"]["STOP"] == 1
+    # risk buckets computed from persisted decision risk scores
+    assert body["recovery_decisions_by_risk_bucket"]["medium"] == 1  # 0.4
+    assert body["recovery_decisions_by_risk_bucket"]["high"] == 1    # 0.9
+    assert body["recovery_decisions_by_risk_bucket"]["low"] == 0
+    assert body["recovery_decisions_by_risk_bucket"]["unknown"] == 0
 
 
 # ---------------------------------------------------------------------------
@@ -311,13 +378,21 @@ def test_audit_listing(api):
     assert len(body["items"]) == 2
     item = body["items"][0]
     for key in ("id", "transaction_id", "transaction_external_id", "actor",
-                "action", "detail", "occurred_at"):
+                "action", "detail", "occurred_at",
+                "llm_requested_action", "policy_decision", "execution_status"):
         assert key in item
     # structured detail parsed from stored JSON
     assert isinstance(item["detail"], dict)
+    # flat views of the detail populated for evaluate events only
+    evaluated = [a for a in body["items"] if a["transaction_id"] is not None]
+    assert evaluated[0]["policy_decision"] == "ALLOW"
+    assert evaluated[0]["execution_status"] == "recovered"
+    assert evaluated[0]["llm_requested_action"] == "RETRY_NOW"
     # transaction reference resolved where available
     system = [a for a in body["items"] if a["transaction_id"] is None]
     assert system and system[0]["transaction_external_id"] is None
+    assert system[0]["policy_decision"] is None
+    assert not isinstance(body["items"][0]["detail"], str)
 
 
 def test_audit_filter_by_transaction(api):

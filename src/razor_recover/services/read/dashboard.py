@@ -25,7 +25,10 @@ from src.razor_recover.schemas.dashboard import (
     CustomerReference,
     MerchantReference,
     RecoveryAttemptRead,
+    RecoveryAttemptSummary,
     RecoveryDecisionRead,
+    RecoveryDecisionSummary,
+    ShieldRuleResult,
     SummaryResponse,
     TransactionDetail,
     TransactionListItem,
@@ -78,6 +81,9 @@ class DashboardReadService:
         )
         rows = session.scalars(stmt).all()
 
+        latest_decisions = self._latest_decisions(session, [t.id for t in rows])
+        latest_attempts = self._latest_attempts(session, [t.id for t in rows])
+
         items = []
         for tx in rows:
             merchant_ext = tx.merchant.external_id if tx.merchant is not None else None
@@ -87,6 +93,8 @@ class DashboardReadService:
                     update={
                         "merchant_external_id": merchant_ext,
                         "customer_external_id": customer_ext,
+                        "latest_decision": latest_decisions.get(tx.id),
+                        "latest_attempt": latest_attempts.get(tx.id),
                     }
                 )
             )
@@ -136,6 +144,15 @@ class DashboardReadService:
             reverse=True,
         )
 
+        evaluate_meta = self._latest_evaluate_meta(audit_rows)
+        recovery_probability = evaluate_meta.get("recovery_probability")
+        rule_rows = evaluate_meta.get("rule_results")
+        shield_rule_results = (
+            [ShieldRuleResult.model_validate(r) for r in rule_rows]
+            if isinstance(rule_rows, list)
+            else None
+        )
+
         return TransactionDetail.model_validate(tx).model_copy(
             update={
                 "merchant_external_id": tx.merchant.external_id if tx.merchant else None,
@@ -145,6 +162,8 @@ class DashboardReadService:
                 "decisions": decisions,
                 "attempts": attempts,
                 "audit_logs": [self._audit_item(a, tx.external_id) for a in audit_rows],
+                "recovery_probability": recovery_probability,
+                "shield_rule_results": shield_rule_results,
             }
         )
 
@@ -163,6 +182,7 @@ class DashboardReadService:
         decision_action_counts, _ = self._counts_grouped_total(
             session, RecoveryDecision.action
         )
+        risk_buckets = self._risk_buckets(session)
 
         amount_by_status = self._amounts_grouped(session)
         failed_amount = str(amount_by_status.get("failed", Decimal("0.00")))
@@ -177,6 +197,7 @@ class DashboardReadService:
             recovery_decisions_total=decisions_total,
             recovery_decisions_by_outcome=decision_outcome_counts,
             recovery_decisions_by_action=decision_action_counts,
+            recovery_decisions_by_risk_bucket=risk_buckets,
             failed_amount=failed_amount,
             recovered_amount=recovered_amount,
             total_amount=total_amount,
@@ -267,14 +288,86 @@ class DashboardReadService:
         return {str(status): Decimal(str(value or 0)) for status, value in rows if status}
 
     @staticmethod
-    def _audit_item(log: AuditLog, external_id: str | None) -> AuditLogItem:
-        detail = None
-        if log.detail:
+    def _latest_decisions(
+        session: Session, transaction_ids: list[int]
+    ) -> dict[int, RecoveryDecisionSummary]:
+        """Most recent decision per transaction id (insertion order)."""
+        if not transaction_ids:
+            return {}
+        stmt = (
+            select(RecoveryDecision.transaction_id, RecoveryDecision)
+            .where(RecoveryDecision.transaction_id.in_(transaction_ids))
+            .order_by(RecoveryDecision.id.desc())
+        )
+        latest: dict[int, RecoveryDecisionSummary] = {}
+        for tx_id, row in session.execute(stmt).all():
+            if tx_id not in latest:
+                latest[tx_id] = RecoveryDecisionSummary.model_validate(row)
+        return latest
+
+    @staticmethod
+    def _latest_attempts(
+        session: Session, transaction_ids: list[int]
+    ) -> dict[int, RecoveryAttemptSummary]:
+        """Most recent recovery attempt per transaction id (insertion order)."""
+        if not transaction_ids:
+            return {}
+        stmt = (
+            select(RecoveryAttempt.transaction_id, RecoveryAttempt)
+            .where(RecoveryAttempt.transaction_id.in_(transaction_ids))
+            .order_by(RecoveryAttempt.id.desc())
+        )
+        latest: dict[int, RecoveryAttemptSummary] = {}
+        for tx_id, row in session.execute(stmt).all():
+            if tx_id not in latest:
+                latest[tx_id] = RecoveryAttemptSummary.model_validate(row)
+        return latest
+
+    @staticmethod
+    def _latest_evaluate_meta(audit_rows: list[AuditLog]) -> dict:
+        """Return the detail dict of the newest evaluate audit event, if any."""
+        for log in audit_rows:
+            if not log.detail:
+                continue
             try:
                 parsed = json.loads(log.detail)
-                detail = parsed if isinstance(parsed, dict) else {"raw": parsed}
             except (ValueError, TypeError):
-                detail = {"raw": log.detail}
+                continue
+            if isinstance(parsed, dict) and (
+                "recovery_probability" in parsed or "rule_results" in parsed
+            ):
+                return parsed
+        return {}
+
+    @staticmethod
+    def _risk_buckets(session: Session) -> dict[str, int]:
+        """Bucket persisted decision risk scores: low/medium/high/unknown."""
+        buckets = {"low": 0, "medium": 0, "high": 0, "unknown": 0}
+        for (score,) in session.execute(select(RecoveryDecision.risk_score)).all():
+            if score is None:
+                buckets["unknown"] += 1
+            elif score < Decimal("0.33"):
+                buckets["low"] += 1
+            elif score < Decimal("0.66"):
+                buckets["medium"] += 1
+            else:
+                buckets["high"] += 1
+        return buckets
+
+    @staticmethod
+    def _audit_item(log: AuditLog, external_id: str | None) -> AuditLogItem:
+        detail = None
+        parsed = None
+        if log.detail:
+            try:
+                loaded = json.loads(log.detail)
+            except (ValueError, TypeError):
+                loaded = None
+            if isinstance(loaded, dict):
+                parsed = loaded
+                detail = parsed
+            elif loaded is not None:
+                detail = {"raw": loaded}
         return AuditLogItem(
             id=log.id,
             transaction_id=log.transaction_id,
@@ -284,6 +377,9 @@ class DashboardReadService:
             detail=detail,
             occurred_at=log.occurred_at,
             created_at=log.created_at,
+            llm_requested_action=(parsed or {}).get("llm_requested_action"),
+            policy_decision=(parsed or {}).get("policy_decision"),
+            execution_status=(parsed or {}).get("execution_status"),
         )
 
 
