@@ -79,7 +79,7 @@ export function RecoveryCommandCenter() {
                 <RecoveryOutcomesChart counts={summary.recovery_decisions_by_outcome} />
               </ChartCard>
               <ChartCard title="Recovery Probability">
-                <RecoveryProbability />
+                <RecoveryProbability buckets={summary.recovery_decisions_by_probability_bucket} />
               </ChartCard>
               <ChartCard title="Risk Distribution">
                 <RiskDistribution

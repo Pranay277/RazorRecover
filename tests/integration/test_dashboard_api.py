@@ -469,6 +469,9 @@ def test_summary_empty_db(api):
     assert body["recovery_decisions_by_risk_bucket"] == {
         "low": 0, "medium": 0, "high": 0, "unknown": 0,
     }
+    assert body["recovery_decisions_by_probability_bucket"] == {
+        "0-20": 0, "20-40": 0, "40-60": 0, "60-80": 0, "80-100": 0, "unknown": 0,
+    }
 
 
 def test_summary_metrics_calculated(api):
@@ -498,6 +501,122 @@ def test_summary_metrics_calculated(api):
     assert body["recovery_decisions_by_risk_bucket"]["high"] == 1    # 0.9
     assert body["recovery_decisions_by_risk_bucket"]["low"] == 0
     assert body["recovery_decisions_by_risk_bucket"]["unknown"] == 0
+    # probability buckets computed from persisted evaluate audit details
+    prob = body["recovery_decisions_by_probability_bucket"]
+    assert prob["60-80"] == 1     # seeded recovery_probability 0.72
+    assert sum(prob.values()) == 1  # only the one evaluate event counts
+    assert prob["0-20"] == 0
+    assert prob["20-40"] == 0
+    assert prob["40-60"] == 0
+    assert prob["80-100"] == 0
+    assert prob["unknown"] == 0
+
+
+def test_summary_probability_buckets_count(api):
+    """Counting spans every evaluate event and only evaluate events."""
+    session = api._session  # type: ignore[attr-defined]
+    _seed(session, audits=False)
+    tx1 = session.query(Transaction).filter_by(external_id="tx-1").one()
+    tx2 = session.query(Transaction).filter_by(external_id="tx-2").one()
+    tx3 = session.query(Transaction).filter_by(external_id="tx-3").one()
+    session.add_all([
+        AuditLog(
+            transaction_id=tx1.id, actor="recovery.workflow",
+            action="recovery.evaluate:ALLOW",
+            detail='{"recovery_probability": 0.05, "policy_decision": "ALLOW"}',
+            occurred_at=datetime(2026, 1, 2, tzinfo=timezone.utc)),
+        AuditLog(
+            transaction_id=tx2.id, actor="recovery.workflow",
+            action="recovery.evaluate:ALLOW",
+            detail='{"recovery_probability": 0.35, "policy_decision": "ALLOW"}',
+            occurred_at=datetime(2026, 2, 2, tzinfo=timezone.utc)),
+        AuditLog(
+            transaction_id=tx3.id, actor="recovery.workflow",
+            action="recovery.evaluate:REVIEW",
+            detail='{"recovery_probability": 0.55, "policy_decision": "REVIEW"}',
+            occurred_at=datetime(2026, 3, 2, tzinfo=timezone.utc)),
+        AuditLog(
+            transaction_id=None, actor="system",
+            action="system.startup",
+            detail='{"booting": true, "recovery_probability": 0.99}',
+            occurred_at=datetime(2026, 1, 1, tzinfo=timezone.utc)),
+    ])
+    session.flush()
+    resp = api.get("/api/v1/summary")
+    assert resp.status_code == 200
+    prob = resp.json()["recovery_decisions_by_probability_bucket"]
+    assert prob == {
+        "0-20": 1, "20-40": 1, "40-60": 1, "60-80": 0, "80-100": 0, "unknown": 0,
+    }
+
+
+def test_summary_probability_bucket_boundaries(api):
+    """Bucket definition: inclusive lower bound, so values are counted once."""
+    session = api._session  # type: ignore[attr-defined]
+    _seed(session, audits=False)
+    tx1 = session.query(Transaction).filter_by(external_id="tx-1").one()
+    boundaries = [
+        ("0.00", "0-20"),
+        ("0.19", "0-20"),
+        ("0.20", "20-40"),
+        ("0.39", "20-40"),
+        ("0.40", "40-60"),
+        ("0.59", "40-60"),
+        ("0.60", "60-80"),
+        ("0.79", "60-80"),
+        ("0.80", "80-100"),
+        ("1.00", "80-100"),
+    ]
+    for i, (value, expected) in enumerate(boundaries):
+        session.add(AuditLog(
+            transaction_id=tx1.id, actor="recovery.workflow",
+            action="recovery.evaluate:ALLOW",
+            detail=f'{{"recovery_probability": {value}, "policy_decision": "ALLOW"}}',
+            occurred_at=datetime(2026, 1, 2, tzinfo=timezone.utc)))
+    session.flush()
+    resp = api.get("/api/v1/summary")
+    assert resp.status_code == 200
+    prob = resp.json()["recovery_decisions_by_probability_bucket"]
+    expected = {"0-20": 0, "20-40": 0, "40-60": 0, "60-80": 0, "80-100": 0, "unknown": 0}
+    for value, bucket in boundaries:
+        expected[bucket] += 1
+    assert prob == expected
+
+
+def test_summary_probability_null_and_malformed_are_unknown(api):
+    """NULL / missing / unparseable probabilities count as unknown only."""
+    session = api._session  # type: ignore[attr-defined]
+    _seed(session, audits=False)
+    tx1 = session.query(Transaction).filter_by(external_id="tx-1").one()
+    tx2 = session.query(Transaction).filter_by(external_id="tx-2").one()
+    session.add_all([
+        AuditLog(
+            transaction_id=tx1.id, actor="recovery.workflow",
+            action="recovery.evaluate:ALLOW",
+            detail='{"policy_decision": "ALLOW"}',
+            occurred_at=datetime(2026, 1, 2, tzinfo=timezone.utc)),
+        AuditLog(
+            transaction_id=tx1.id, actor="recovery.workflow",
+            action="recovery.evaluate:BLOCK",
+            detail='{"recovery_probability": null, "policy_decision": "BLOCK"}',
+            occurred_at=datetime(2026, 1, 3, tzinfo=timezone.utc)),
+        AuditLog(
+            transaction_id=tx2.id, actor="recovery.workflow",
+            action="recovery.evaluate:ALLOW",
+            detail='not-json',
+            occurred_at=datetime(2026, 2, 2, tzinfo=timezone.utc)),
+        AuditLog(
+            transaction_id=None, actor="system",
+            action="recovery.evaluate:ALLOW",
+            detail=None,
+            occurred_at=datetime(2026, 1, 1, tzinfo=timezone.utc)),
+    ])
+    session.flush()
+    resp = api.get("/api/v1/summary")
+    assert resp.status_code == 200
+    prob = resp.json()["recovery_decisions_by_probability_bucket"]
+    assert prob["unknown"] == 4
+    assert sum(prob.values()) == 4
 
 
 # ---------------------------------------------------------------------------

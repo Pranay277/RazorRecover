@@ -1,4 +1,3 @@
-export { PlaceholderPage } from './PlaceholderPage';
 export { RecoveryCommandCenter } from './RecoveryCommandCenter';
 export { TransactionsInvestigation } from './TransactionsInvestigation';
 export { TransactionDetails } from './TransactionDetails';

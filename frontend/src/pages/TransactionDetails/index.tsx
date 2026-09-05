@@ -7,6 +7,7 @@ import { useTransactionDetail } from './useTransactionDetail';
 import { AiAnalysis } from './components/AiAnalysis';
 import { AuditTrail } from './components/AuditTrail';
 import { DecisionTimeline } from './components/DecisionTimeline';
+import { EvaluateRecovery } from './components/EvaluateRecovery';
 import { PaymentFailureContext } from './components/PaymentFailureContext';
 import { RecoveryHistory } from './components/RecoveryHistory';
 import { ShieldDecision } from './components/ShieldDecision';
@@ -53,7 +54,10 @@ export function TransactionDetails() {
     const latestDecision = detail.decisions.length > 0 ? detail.decisions[0] : null;
     body = (
       <div className={styles.grid}>
-        <TransactionOverview transaction={detail} />
+        <TransactionOverview
+          transaction={detail}
+          action={<EvaluateRecovery transaction={detail} onRefresh={reload} />}
+        />
         <PaymentFailureContext transaction={detail} />
 
         <AiAnalysis transaction={detail} latestDecision={latestDecision} />

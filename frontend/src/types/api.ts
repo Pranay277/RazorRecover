@@ -135,6 +135,7 @@ export interface SummaryResponse {
   recovery_decisions_by_outcome: Record<string, number>;
   recovery_decisions_by_action: Record<string, number>;
   recovery_decisions_by_risk_bucket: Record<string, number>;
+  recovery_decisions_by_probability_bucket: Record<string, number>;
   failed_amount: string;
   recovered_amount: string;
   total_amount: string;
@@ -163,4 +164,26 @@ export interface EvaluateResponse {
 
 export interface EvaluateRequest {
   transaction_id: number;
+}
+
+/** Immediate response when an evaluation is enqueued for async processing. */
+export interface RecoveryTaskAccepted {
+  task_id: string;
+  status: string;
+  transaction_id: number;
+}
+
+/**
+ * States reported by GET /api/v1/recovery/tasks/{task_id}. The backend
+ * normalizes Celery states to exactly these four values.
+ */
+export type RecoveryTaskState = 'PENDING' | 'STARTED' | 'SUCCESS' | 'FAILURE';
+
+/** Stable view of one asynchronous recovery task. */
+export interface RecoveryTaskStatus {
+  task_id: string;
+  transaction_id: number | null;
+  status: RecoveryTaskState;
+  result: EvaluateResponse | null;
+  error: string | null;
 }

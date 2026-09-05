@@ -144,3 +144,9 @@
   font-family: var(--font-mono);
   font-size: 12px;
 }
+
+.actionBar {
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}

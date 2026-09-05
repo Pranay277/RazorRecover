@@ -193,6 +193,7 @@ class DashboardReadService:
             session, RecoveryDecision.action
         )
         risk_buckets = self._risk_buckets(session)
+        probability_buckets = self._probability_buckets(session)
 
         amount_by_status = self._amounts_grouped(session)
         failed_amount = str(amount_by_status.get("failed", Decimal("0.00")))
@@ -208,6 +209,7 @@ class DashboardReadService:
             recovery_decisions_by_outcome=decision_outcome_counts,
             recovery_decisions_by_action=decision_action_counts,
             recovery_decisions_by_risk_bucket=risk_buckets,
+            recovery_decisions_by_probability_bucket=probability_buckets,
             failed_amount=failed_amount,
             recovered_amount=recovered_amount,
             total_amount=total_amount,
@@ -377,6 +379,71 @@ class DashboardReadService:
             else:
                 buckets["high"] += 1
         return buckets
+
+    @staticmethod
+    def _probability_buckets(session: Session) -> dict[str, int]:
+        """Bucket persisted evaluate recovery probabilities into fixed ranges.
+
+        ``recovery_probability`` is persisted in the detail JSON of each
+        ``recovery.evaluate:*`` audit event (one per evaluated decision). The
+        values are bucketed on inclusive lower bounds, so every value lands in
+        exactly one bucket:
+
+        * ``0-20``    - 0.00 <= p < 0.20
+        * ``20-40``   - 0.20 <= p < 0.40
+        * ``40-60``   - 0.40 <= p < 0.60
+        * ``60-80``   - 0.60 <= p < 0.80
+        * ``80-100``  - 0.80 <= p <= 1.00
+        * ``unknown`` - missing / unparseable detail
+
+        Probabilities are never recomputed or fabricated; only persisted values
+        are counted.
+        """
+        buckets = {
+            "0-20": 0, "20-40": 0, "40-60": 0,
+            "60-80": 0, "80-100": 0, "unknown": 0,
+        }
+        rows = session.execute(
+            select(AuditLog.detail).where(
+                AuditLog.action.like("recovery.evaluate:%")
+            )
+        ).all()
+        for (detail,) in rows:
+            probability = DashboardReadService._extract_probability(detail)
+            if probability is None:
+                buckets["unknown"] += 1
+            elif probability < 0.20:
+                buckets["0-20"] += 1
+            elif probability < 0.40:
+                buckets["20-40"] += 1
+            elif probability < 0.60:
+                buckets["40-60"] += 1
+            elif probability < 0.80:
+                buckets["60-80"] += 1
+            else:
+                buckets["80-100"] += 1
+        return buckets
+
+    @staticmethod
+    def _extract_probability(detail: str | None) -> float | None:
+        """Return the persisted ``recovery_probability`` from an audit detail,
+        or ``None`` when the detail is missing / unparseable / lacks the field.
+        """
+        if not detail:
+            return None
+        try:
+            parsed = json.loads(detail)
+        except (ValueError, TypeError):
+            return None
+        if not isinstance(parsed, dict):
+            return None
+        value = parsed.get("recovery_probability")
+        if value is None:
+            return None
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return None
 
     @staticmethod
     def _audit_item(log: AuditLog, external_id: str | None) -> AuditLogItem:

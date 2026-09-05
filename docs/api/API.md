@@ -69,6 +69,71 @@ Error semantics:
 - `404` — transaction does not exist.
 - `503` — an upstream stage failed (ML models unavailable / LLM unavailable / policy evaluation failed). The request fails closed; nothing executes.
 
+## Asynchronous recovery evaluation (Redis + Celery)
+
+The async path runs the **same** recovery workflow (`fetch → ML → RAG → LLM → Shield → Execution → persist → audit`) in a background Celery worker. It does not re-implement any recovery logic — the task is a thin adapter over the existing orchestrator.
+
+- **Redis role**: two logical databases. `:0` is the Celery **broker** (message/queue transport), `:1` is the Celery **result backend** (task state + serialized results). The API server and worker share the same Redis instance.
+- **Celery role**: runs `recovery.evaluate_async` tasks in a worker process, invoking the existing `RecoveryOrchestrator`. Worker failures are recorded as task `FAILURE` (never silently swallowed).
+
+### `POST /api/v1/recovery/evaluate/async`
+
+Enqueues a recovery evaluation and returns immediately with a task id. The workflow is **not** executed inside this endpoint.
+
+Request body:
+
+```json
+{ "transaction_id": 42 }
+```
+
+Response (`202 Accepted`):
+
+```json
+{
+  "task_id": "…",
+  "status": "queued",
+  "transaction_id": 42
+}
+```
+
+### `GET /api/v1/recovery/tasks/{task_id}`
+
+Polls the state of a queued task. Polling never enqueues another task.
+
+Response (`200`):
+
+```json
+{
+  "task_id": "…",
+  "transaction_id": 42,
+  "status": "SUCCESS",
+  "result": { "transaction_id": 42, "risk_score": 0.23, "recovery_probability": 0.61, "recommended_action": "RETRY_NOW", "policy_decision": "ALLOW", "authorized_action": "RETRY_NOW", "execution_status": "recovered", "recovery_status": "recovered", "rationale": "…", "policy_reasons": ["…"], "audit_id": 7 },
+  "error": null
+}
+```
+
+`status` is one of:
+
+| Status | Meaning |
+| --- | --- |
+| `PENDING` | Queued, not started |
+| `STARTED` | Worker is executing |
+| `SUCCESS` | Workflow completed; `result` holds the serialized evaluation response |
+| `FAILURE` | Workflow failed; `error` holds a safe message (never a stack trace) |
+
+`transaction_id` and `result` are `null` unless the task has completed successfully.
+
+### Worker startup (local dev, PowerShell)
+
+Run from the repository root with the `Razor` virtual environment, and ensure `src` is on `PYTHONPATH`:
+
+```powershell
+$env:PYTHONPATH = "src"
+& .\Razor\Scripts\celery.exe -A razor_recover.tasks.celery_app:celery_app worker --pool=solo --loglevel=info
+```
+
+The `--pool=solo` flag is required on Windows (prefork is not supported there). Redis must be running on `localhost:6379` (broker `redis://localhost:6379/0`, result backend `redis://localhost:6379/1`).
+
 ## Transactions
 
 ### `GET /api/v1/transactions`

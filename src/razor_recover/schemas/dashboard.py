@@ -203,6 +203,10 @@ class SummaryResponse(BaseModel):
     # (low < 0.33, medium < 0.66, high >= 0.66, unknown = NULL).
     recovery_decisions_by_risk_bucket: dict[str, int] = Field(default_factory=dict)
 
+    # Probability buckets computed from persisted evaluate audit details
+    # (inclusive lower bound: 0-20/20-40/40-60/60-80/80-100, unknown = missing).
+    recovery_decisions_by_probability_bucket: dict[str, int] = Field(default_factory=dict)
+
     # Monetary aggregates across transactions (as strings to preserve precision).
     failed_amount: str
     recovered_amount: str

@@ -130,6 +130,14 @@ The frontend reads persisted data only; it never triggers recovery or mutates st
 - **Settings**: `src/razor_recover/config.py` (pydantic-settings), loaded from environment vars or `.env` (see `.env.example`).
 - **Infrastructure** (via `docker/docker-compose.yml`): PostgreSQL 16 (`localhost:5433`) and Qdrant (`localhost:6333`).
 - **Scripts** (`scripts/`): `generate_synthetic_data.py`, `train_ml_models.py`, `seed_vector_db.py`.
+- **RAG knowledge base / vector dimension**: the knowledge base lives in the Qdrant collection `razorrecover_knowledge` (config `qdrant_collection`). The collection vector dimension is always derived from `rag_embedding_dim` (default **256**) at seed time — embeddings, config, and the collection must all agree. To (re)create the collection at the configured dimension, seeding is idempotent: it deletes and rebuilds the target collection. Run with project defaults (dim 256, hash provider, Qdrant):
+
+  ```
+  $env:PYTHONPATH="src"
+  python scripts/seed_vector_db.py
+  ```
+
+  If the live collection was ever created at a different dimension, re-run the seed to rebuild it; no other code change is required.
 - Placeholder scaffolding that this repository does **not** yet implement: `fetchers/*` (context fetchers beyond DB models), `core/redis.py`, `core/security.py`, a production Dockerfile, and real CI/deploy workflows (`Makefile` and `.github/workflows/` remain placeholders).
 
 ## 8. Technology choices

@@ -35,6 +35,10 @@ class Settings(BaseSettings):
     # Redis
     redis_url: str = "redis://localhost:6379/0"
 
+    # Celery / async recovery execution
+    celery_broker_url: str = "redis://localhost:6379/0"
+    celery_result_backend: str = "redis://localhost:6379/1"
+
     # Qdrant
     qdrant_url: str = "http://localhost:6333"
 

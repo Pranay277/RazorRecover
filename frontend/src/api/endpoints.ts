@@ -8,6 +8,8 @@ import type {
   AuditListResponse,
   EvaluateRequest,
   EvaluateResponse,
+  RecoveryTaskAccepted,
+  RecoveryTaskStatus,
   SummaryResponse,
   TransactionDetail,
   TransactionListResponse,
@@ -55,4 +57,18 @@ export function evaluateRecovery(payload: EvaluateRequest): Promise<EvaluateResp
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
+}
+
+export function evaluateRecoveryAsync(payload: EvaluateRequest): Promise<RecoveryTaskAccepted> {
+  return request<RecoveryTaskAccepted>('/api/v1/recovery/evaluate/async', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+}
+
+export function getRecoveryTaskStatus(taskId: string): Promise<RecoveryTaskStatus> {
+  return request<RecoveryTaskStatus>(
+    `/api/v1/recovery/tasks/${encodeURIComponent(taskId)}`,
+  );
 }
