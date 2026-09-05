@@ -1,0 +1,73 @@
+.txLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-info);
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.txLink:hover {
+  text-decoration: underline;
+}
+
+.txId {
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.linkIcon {
+  width: 13px;
+  height: 13px;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.txLink:hover .linkIcon {
+  color: var(--color-info);
+}
+
+.action {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-text);
+}
+
+.aiChip {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-soft);
+  color: var(--color-text);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.chevronHead {
+  width: 32px;
+}
+
+.chevronCell {
+  width: 32px;
+}
+
+.chevron {
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-muted);
+  transition: transform 0.15s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.detailRow {
+  background: var(--color-surface);
+}
+
+.detailCell {
+  padding: var(--space-2) var(--space-4) var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
