@@ -71,24 +71,32 @@ The allowed actions the agent may recommend are: `RETRY_NOW`, `DELAYED_RETRY`, `
 ```mermaid
 flowchart TD
     P[Failed Payment / Transaction] --> API[FastAPI API]
+
     API --> CTX[Context Assembly]
+
     CTX --> ML[ML Risk + Recovery Prediction]
     CTX --> RAG[RAG Policy Retrieval]
+
     ML --> AGENT[LLM Decision Agent]
     RAG --> AGENT
+
     AGENT --> SHIELD[Deterministic Shield / Policy Engine]
+
     SHIELD -->|ALLOW| EXEC[Execution Layer]
     SHIELD -->|REVIEW| REVIEW[Manual Review Escalation]
     SHIELD -->|BLOCK| BLOCK[No Execution]
+
     EXEC --> AUDIT[Decision + Audit Persistence]
     REVIEW --> AUDIT
     BLOCK --> AUDIT
+
     AUDIT --> DASH[Merchant Dashboard Read APIs]
     DASH --> UI[React Dashboard]
 
-    subgraph async[Optional Async Path (Redis + Celery)]
+    subgraph async_path["Async Path — Redis + Celery"]
         API -->|enqueue| Q[Recovery Task Queue]
-        Q --> W[Celery Worker]
+        Q -->|broker| REDIS[Redis]
+        REDIS --> W[Celery Worker]
         W --> CTX
     end
 ```
