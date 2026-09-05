@@ -83,8 +83,11 @@ export function Sidebar() {
   return (
     <aside className={styles.sidebar}>
       <div className={styles.brand}>
-        <span className={styles.brandName}>RazorRecover</span>
-        <span className={styles.brandSub}>Merchant Ops</span>
+        <img className={styles.brandLogo} src="/razorrecover-logo.png" alt="RazorRecover" />
+        <span className={styles.brandText}>
+          <span className={styles.brandName}>RazorRecover</span>
+          <span className={styles.brandSub}>Merchant Ops</span>
+        </span>
       </div>
       <nav className={styles.nav} aria-label="Main">
         {NAV_ITEMS.map((item) => (

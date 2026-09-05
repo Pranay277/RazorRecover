@@ -11,8 +11,21 @@
 .brand {
   padding: var(--space-5) var(--space-5) var(--space-4);
   display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.brandLogo {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.brandText {
+  display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 0;
 }
 
 .brandName {
