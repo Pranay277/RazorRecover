@@ -4,6 +4,7 @@ import { AppLayout } from '@/components';
 import {
   PlaceholderPage,
   RecoveryCommandCenter,
+  TransactionDetails,
   TransactionsInvestigation,
 } from '@/pages';
 
@@ -22,15 +23,7 @@ export default function App() {
             />
           }
         />
-        <Route
-          path="transactions/:transactionId"
-          element={
-            <PlaceholderPage
-              title="Transaction Details"
-              description="The full persisted view of a single transaction will be implemented here."
-            />
-          }
-        />
+        <Route path="transactions/:transactionId" element={<TransactionDetails />} />
         <Route
           path="audit"
           element={

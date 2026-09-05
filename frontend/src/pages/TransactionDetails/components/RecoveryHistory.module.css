@@ -1,0 +1,24 @@
+.count {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.footer {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.empty {
+  margin: 0;
+  padding: var(--space-3) 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+}
+
+.errorCell {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

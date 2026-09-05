@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import type { ReactNode } from 'react';
 
 import styles from './Sidebar.module.css';
@@ -7,6 +7,8 @@ interface NavItem {
   to: string;
   label: string;
   end?: boolean;
+  /** Custom active matcher. Deduped against the route's own matching rules. */
+  match?: RegExp;
   icon: ReactNode;
 }
 
@@ -51,12 +53,33 @@ function AuditIcon() {
 
 const NAV_ITEMS: NavItem[] = [
   { to: '/', label: 'Recovery Command Center Refined', end: true, icon: <DashboardIcon /> },
-  { to: '/transactions', label: 'Transactions Investigation', icon: <TransactionIcon /> },
-  { to: '/transaction-details', label: 'Transaction Details', icon: <DetailsIcon /> },
+  {
+    to: '/transactions',
+    label: 'Transactions Investigation',
+    match: /^\/transactions\/?$/,
+    icon: <TransactionIcon />,
+  },
+  {
+    to: '/transaction-details',
+    label: 'Transaction Details',
+    match: /^(\/transaction-details\/?|\/transactions\/\d+\/?)$/,
+    icon: <DetailsIcon />,
+  },
   { to: '/audit', label: 'Audit logs', icon: <AuditIcon /> },
 ];
 
+function isNavActive(item: NavItem, pathname: string): boolean {
+  if (item.match) {
+    return item.match.test(pathname);
+  }
+  if (item.end) {
+    return pathname === item.to;
+  }
+  return pathname.startsWith(item.to);
+}
+
 export function Sidebar() {
+  const { pathname } = useLocation();
   return (
     <aside className={styles.sidebar}>
       <div className={styles.brand}>
@@ -69,9 +92,12 @@ export function Sidebar() {
             key={item.to}
             to={item.to}
             end={item.end}
-            className={({ isActive }) =>
-              [styles.link, isActive && styles.active].filter(Boolean).join(' ')
-            }
+            className={[
+              styles.link,
+              isNavActive(item, pathname) && styles.active,
+            ]
+              .filter(Boolean)
+              .join(' ')}
           >
             <span className={styles.icon}>{item.icon}</span>
             {item.label}
