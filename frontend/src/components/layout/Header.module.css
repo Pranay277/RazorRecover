@@ -12,9 +12,22 @@
   z-index: 10;
 }
 
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
 .title {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  font-size: 12.5px;
+  color: var(--color-text-muted);
 }
 
 .badge {
@@ -25,4 +38,5 @@
   border-radius: var(--radius-full);
   padding: 4px 12px;
   white-space: nowrap;
+  flex-shrink: 0;
 }

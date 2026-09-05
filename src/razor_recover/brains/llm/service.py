@@ -10,11 +10,11 @@ from __future__ import annotations
 
 import logging
 
-from src.razor_recover.brains.llm.agent import DecisionAgent
-from src.razor_recover.brains.llm.providers import LLMProvider, create_llm_provider
-from src.razor_recover.brains.llm.schemas import AgentDecision, DecisionRequest
-from src.razor_recover.config import Settings, get_settings
-from src.razor_recover.core.logger import get_logger
+from razor_recover.brains.llm.agent import DecisionAgent
+from razor_recover.brains.llm.providers import LLMProvider, create_llm_provider
+from razor_recover.brains.llm.schemas import AgentDecision, DecisionRequest
+from razor_recover.config import Settings, get_settings
+from razor_recover.core.logger import get_logger
 
 logger: logging.Logger = get_logger("brains.llm.service")
 

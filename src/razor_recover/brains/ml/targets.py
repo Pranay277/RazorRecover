@@ -18,7 +18,7 @@ risk of loss and probability of recovery are opposite sides of the same coin.
 
 import numpy as np
 
-from src.razor_recover.synthetic.schemas import SyntheticDataset
+from razor_recover.synthetic.schemas import SyntheticDataset
 
 
 def recovery_targets(dataset: SyntheticDataset) -> np.ndarray:

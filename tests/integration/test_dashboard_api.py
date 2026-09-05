@@ -16,15 +16,15 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from src.razor_recover.api import dependencies
-from src.razor_recover.core.database import Base
-from src.razor_recover.db.models.audit import AuditLog
-from src.razor_recover.db.models.customer import Customer
-from src.razor_recover.db.models.decision import RecoveryDecision
-from src.razor_recover.db.models.merchant import Merchant
-from src.razor_recover.db.models.recovery import RecoveryAttempt
-from src.razor_recover.db.models.transaction import Transaction
-from src.razor_recover.main import create_app
+from razor_recover.api import dependencies
+from razor_recover.core.database import Base
+from razor_recover.db.models.audit import AuditLog
+from razor_recover.db.models.customer import Customer
+from razor_recover.db.models.decision import RecoveryDecision
+from razor_recover.db.models.merchant import Merchant
+from razor_recover.db.models.recovery import RecoveryAttempt
+from razor_recover.db.models.transaction import Transaction
+from razor_recover.main import create_app
 
 
 # ---------------------------------------------------------------------------
@@ -113,6 +113,32 @@ def _seed(session: Session, *, audits: bool = True, attempts: bool = True,
     return merchant, customer
 
 
+def _seed_dated(session: Session):
+    """Seed transactions with controlled created_at values for date-range tests."""
+    merchant = Merchant(external_id="m-2", name="Acme Corp", industry="retail")
+    customer = Customer(external_id="c-2", name="Jane Doe", email="jane@example.com")
+    session.add_all([merchant, customer])
+    session.flush()
+    dated = [
+        ("s-tx-1", datetime(2026, 1, 10, 9, 30, tzinfo=timezone.utc)),
+        ("s-tx-2", datetime(2026, 2, 10, 12, 0, tzinfo=timezone.utc)),
+        ("s-tx-3", datetime(2026, 3, 10, 18, 45, tzinfo=timezone.utc)),
+    ]
+    session.add_all([
+        Transaction(
+            external_id=ext, created_at=created_at,
+            customer_id=customer.id, merchant_id=merchant.id,
+            amount=Decimal("25.00"), currency="USD", status="failed",
+            failure_code="card_declined", failure_reason="declined",
+            payment_method="card", gateway="stripe", attempt_number=1,
+            attempted_at=created_at,
+        )
+        for ext, created_at in dated
+    ])
+    session.flush()
+    return merchant, customer
+
+
 # ---------------------------------------------------------------------------
 # API fixture (thread-safe in-memory SQLite + TestClient)
 # ---------------------------------------------------------------------------
@@ -135,7 +161,7 @@ def api():
         yield session
 
     def override_read_service():
-        from src.razor_recover.services.read.dashboard import DashboardReadService
+        from razor_recover.services.read.dashboard import DashboardReadService
         return DashboardReadService()
 
     app.dependency_overrides[dependencies.db_session] = override_db
@@ -260,6 +286,67 @@ def test_list_transactions_empty_recovery_state(api):
     body = resp.json()
     assert all(t["latest_decision"] is None for t in body["items"])
     assert all(t["latest_attempt"] is None for t in body["items"])
+
+
+def test_list_transactions_search_by_external_id(api):
+    session = api._session  # type: ignore[attr-defined]
+    _seed(session)
+    resp = api.get("/api/v1/transactions", params={"search": "tx-1"})
+    body = resp.json()
+    assert body["total"] == 1
+    assert [t["external_id"] for t in body["items"]] == ["tx-1"]
+
+    resp = api.get("/api/v1/transactions", params={"search": "no-such-txn"})
+    assert resp.json()["total"] == 0
+
+
+def test_list_transactions_search_by_customer_external_id(api):
+    session = api._session  # type: ignore[attr-defined]
+    _seed(session)
+    resp = api.get("/api/v1/transactions", params={"search": "c-1"})
+    body = resp.json()
+    assert body["total"] == 3
+    assert all(t["customer_external_id"] == "c-1" for t in body["items"])
+
+
+def test_list_transactions_search_partial_and_case_insensitive(api):
+    session = api._session  # type: ignore[attr-defined]
+    _seed(session)
+    resp = api.get("/api/v1/transactions", params={"search": "TX-"})
+    body = resp.json()
+    assert body["total"] == 3
+    # search composes with other filters and respects pagination totals
+    resp = api.get("/api/v1/transactions",
+                   params={"search": "tx", "status": "failed", "limit": 2})
+    body = resp.json()
+    assert body["total"] == 2
+    assert len(body["items"]) == 2
+    assert resp.json()  # JSON parseable
+
+
+def test_list_transactions_created_date_range(api):
+    session = api._session  # type: ignore[attr-defined]
+    _seed_dated(session)
+
+    jan = api.get("/api/v1/transactions",
+                  params={"created_from": "2026-01-01", "created_to": "2026-01-31"})
+    assert [t["external_id"] for t in jan.json()["items"]] == ["s-tx-1"]
+    assert jan.json()["total"] == 1
+
+    single_day = api.get("/api/v1/transactions",
+                         params={"created_from": "2026-02-10",
+                                 "created_to": "2026-02-10"})
+    assert [t["external_id"] for t in single_day.json()["items"]] == ["s-tx-2"]
+    assert single_day.json()["total"] == 1
+
+    open_ended = api.get("/api/v1/transactions",
+                         params={"created_from": "2026-03-01"})
+    assert [t["external_id"] for t in open_ended.json()["items"]] == ["s-tx-3"]
+    assert open_ended.json()["total"] == 1
+
+    all_dates = api.get("/api/v1/transactions",
+                        params={"created_to": "2026-04-01"})
+    assert all_dates.json()["total"] == 3
 
 
 # ---------------------------------------------------------------------------
@@ -427,6 +514,7 @@ def test_read_endpoints_do_not_mutate_database(api):
     tx_id = session.query(Transaction).filter_by(external_id="tx-1").one().id
     api.get("/api/v1/transactions")
     api.get("/api/v1/transactions", params={"status": "failed"})
+    api.get("/api/v1/transactions", params={"search": "tx", "created_from": "2026-01-01"})
     api.get(f"/api/v1/transactions/{tx_id}")
     api.get("/api/v1/summary")
     api.get("/api/v1/audit")

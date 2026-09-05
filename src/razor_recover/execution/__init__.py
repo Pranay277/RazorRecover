@@ -5,7 +5,7 @@ changes a decision or calls the LLM - it only executes explicit ALLOW decisions
 and records the outcome.
 """
 
-from src.razor_recover.execution.exceptions import (
+from razor_recover.execution.exceptions import (
     ExecutionError,
     GatewayError,
     GatewayTimeoutError,
@@ -13,19 +13,19 @@ from src.razor_recover.execution.exceptions import (
     NotificationError,
     UnauthorizedExecutionError,
 )
-from src.razor_recover.execution.gateway import (
+from razor_recover.execution.gateway import (
     MockPaymentGateway,
     PaymentGateway,
     create_payment_gateway,
 )
-from src.razor_recover.execution.notification_service import (
+from razor_recover.execution.notification_service import (
     MockNotificationProvider,
     NotificationProvider,
     NotificationService,
 )
-from src.razor_recover.execution.recovery_service import RecoveryService
-from src.razor_recover.execution.retry_service import RetryService
-from src.razor_recover.execution.schemas import (
+from razor_recover.execution.recovery_service import RecoveryService
+from razor_recover.execution.retry_service import RetryService
+from razor_recover.execution.schemas import (
     ExecutionResult,
     ExecutionStatus,
     GatewayChargeResult,

@@ -50,3 +50,7 @@
 .alignCenter {
   text-align: center;
 }
+
+.mono {
+  font-family: var(--font-mono);
+}

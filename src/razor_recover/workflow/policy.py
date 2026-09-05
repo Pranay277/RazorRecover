@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from src.razor_recover.shield.schemas import MerchantPolicy, ShieldConfig
+from razor_recover.shield.schemas import MerchantPolicy, ShieldConfig
 
 
 class MerchantPolicyProvider(Protocol):

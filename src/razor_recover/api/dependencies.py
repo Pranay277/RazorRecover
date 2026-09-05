@@ -10,10 +10,10 @@ from functools import lru_cache
 
 from sqlalchemy.orm import Session
 
-from src.razor_recover.core.database import get_db
-from src.razor_recover.services.read.dashboard import DashboardReadService
-from src.razor_recover.workflow.deps import build_orchestrator
-from src.razor_recover.workflow.orchestrator import RecoveryOrchestrator
+from razor_recover.core.database import get_db
+from razor_recover.services.read.dashboard import DashboardReadService
+from razor_recover.workflow.deps import build_orchestrator
+from razor_recover.workflow.orchestrator import RecoveryOrchestrator
 
 
 def db_session() -> Generator[Session, None, None]:

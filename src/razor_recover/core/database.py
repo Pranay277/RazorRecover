@@ -11,7 +11,7 @@ from collections.abc import Generator
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
-from src.razor_recover.config import get_settings
+from razor_recover.config import get_settings
 
 
 class Base(DeclarativeBase):

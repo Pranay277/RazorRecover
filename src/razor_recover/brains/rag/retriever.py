@@ -10,11 +10,11 @@ from __future__ import annotations
 import logging
 from typing import Any, Mapping
 
-from src.razor_recover.brains.rag.embeddings import EmbeddingProvider
-from src.razor_recover.brains.rag.exceptions import RetrieverError, VectorStoreError
-from src.razor_recover.brains.rag.schemas import RetrievalHit, RetrievalResult
-from src.razor_recover.brains.rag.vector_store import VectorStore
-from src.razor_recover.core.logger import get_logger
+from razor_recover.brains.rag.embeddings import EmbeddingProvider
+from razor_recover.brains.rag.exceptions import RetrieverError, VectorStoreError
+from razor_recover.brains.rag.schemas import RetrievalHit, RetrievalResult
+from razor_recover.brains.rag.vector_store import VectorStore
+from razor_recover.core.logger import get_logger
 
 logger: logging.Logger = get_logger("brains.rag.retriever")
 

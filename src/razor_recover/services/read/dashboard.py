@@ -15,11 +15,12 @@ from decimal import Decimal
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, joinedload, selectinload
 
-from src.razor_recover.db.models.audit import AuditLog
-from src.razor_recover.db.models.decision import RecoveryDecision
-from src.razor_recover.db.models.recovery import RecoveryAttempt
-from src.razor_recover.db.models.transaction import Transaction
-from src.razor_recover.schemas.dashboard import (
+from razor_recover.db.models.audit import AuditLog
+from razor_recover.db.models.customer import Customer
+from razor_recover.db.models.decision import RecoveryDecision
+from razor_recover.db.models.recovery import RecoveryAttempt
+from razor_recover.db.models.transaction import Transaction
+from razor_recover.schemas.dashboard import (
     AuditListResponse,
     AuditLogItem,
     CustomerReference,
@@ -51,6 +52,9 @@ class DashboardReadService:
         payment_method: str | None = None,
         gateway: str | None = None,
         failure_code: str | None = None,
+        search: str | None = None,
+        created_from: datetime | None = None,
+        created_to: datetime | None = None,
         limit: int = 50,
         offset: int = 0,
     ) -> TransactionListResponse:
@@ -62,6 +66,9 @@ class DashboardReadService:
             payment_method=payment_method,
             gateway=gateway,
             failure_code=failure_code,
+            search=search,
+            created_from=created_from,
+            created_to=created_to,
         )
         stmt = (
             select(Transaction)
@@ -78,6 +85,9 @@ class DashboardReadService:
             payment_method=payment_method,
             gateway=gateway,
             failure_code=failure_code,
+            search=search,
+            created_from=created_from,
+            created_to=created_to,
         )
         rows = session.scalars(stmt).all()
 
@@ -236,7 +246,8 @@ class DashboardReadService:
 
     @staticmethod
     def _apply_filters(stmt, *, status, merchant_id, customer_id,
-                       payment_method, gateway, failure_code):
+                       payment_method, gateway, failure_code,
+                       search=None, created_from=None, created_to=None):
         if status is not None:
             stmt = stmt.where(Transaction.status == status)
         if merchant_id is not None:
@@ -249,6 +260,19 @@ class DashboardReadService:
             stmt = stmt.where(Transaction.gateway == gateway)
         if failure_code is not None:
             stmt = stmt.where(Transaction.failure_code == failure_code)
+        if search:
+            term = f"%{search.strip()}%"
+            customer_ids = select(Customer.id).where(
+                Customer.external_id.ilike(term)
+            )
+            stmt = stmt.where(
+                Transaction.external_id.ilike(term)
+                | Transaction.customer_id.in_(customer_ids)
+            )
+        if created_from is not None:
+            stmt = stmt.where(Transaction.created_at >= created_from)
+        if created_to is not None:
+            stmt = stmt.where(Transaction.created_at < created_to)
         return stmt
 
     def _count_transactions(self, session: Session, **filters) -> int:

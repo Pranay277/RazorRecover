@@ -22,8 +22,8 @@ from typing import Protocol
 
 import numpy as np
 
-from src.razor_recover.brains.rag.exceptions import EmbeddingError
-from src.razor_recover.core.logger import get_logger
+from razor_recover.brains.rag.exceptions import EmbeddingError
+from razor_recover.core.logger import get_logger
 
 logger: logging.Logger = get_logger("brains.rag.embeddings")
 

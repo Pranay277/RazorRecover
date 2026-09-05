@@ -11,7 +11,7 @@ from enum import Enum
 
 from pydantic import BaseModel, Field, field_validator
 
-from src.razor_recover.brains.rag.schemas import RetrievalResult
+from razor_recover.brains.rag.schemas import RetrievalResult
 
 
 class AllowedAction(str, Enum):

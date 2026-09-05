@@ -15,18 +15,18 @@ from typing import Any
 
 from pydantic import ValidationError
 
-from src.razor_recover.brains.llm.exceptions import (
+from razor_recover.brains.llm.exceptions import (
     InvalidDecisionError,
     LLMError,
     LLMProviderError,
 )
-from src.razor_recover.brains.llm.prompts import build_messages
-from src.razor_recover.brains.llm.providers import LLMProvider
-from src.razor_recover.brains.llm.schemas import (
+from razor_recover.brains.llm.prompts import build_messages
+from razor_recover.brains.llm.providers import LLMProvider
+from razor_recover.brains.llm.schemas import (
     AgentDecision,
     DecisionRequest,
 )
-from src.razor_recover.core.logger import get_logger
+from razor_recover.core.logger import get_logger
 
 logger: logging.Logger = get_logger("brains.llm.agent")
 

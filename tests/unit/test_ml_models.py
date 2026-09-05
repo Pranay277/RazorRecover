@@ -6,22 +6,22 @@ import numpy as np
 import pytest
 from sklearn.linear_model import LogisticRegression
 
-from src.razor_recover.brains.ml import features, targets
-from src.razor_recover.brains.ml.features import (
+from razor_recover.brains.ml import features, targets
+from razor_recover.brains.ml.features import (
     EXCLUDED_LEAKED_FIELDS,
     build_feature_matrix,
     build_single_transaction_features,
     feature_names,
 )
-from src.razor_recover.brains.ml.model_base import (
+from razor_recover.brains.ml.model_base import (
     InvalidInputError,
     MissingFeatureError,
     ModelArtifactError,
 )
-from src.razor_recover.brains.ml.recovery_model import RecoveryModel
-from src.razor_recover.brains.ml.risk_model import RiskModel
-from src.razor_recover.brains.ml.training import TrainingConfig, train_models
-from src.razor_recover.synthetic import SyntheticDataConfig, generate_dataset
+from razor_recover.brains.ml.recovery_model import RecoveryModel
+from razor_recover.brains.ml.risk_model import RiskModel
+from razor_recover.brains.ml.training import TrainingConfig, train_models
+from razor_recover.synthetic import SyntheticDataConfig, generate_dataset
 
 
 def _dataset(**overrides):
@@ -60,7 +60,7 @@ def test_feature_matrix_is_numeric_and_on_hot():
 
 
 def _one_hot_cardinality():
-    from src.razor_recover.synthetic.constants import (
+    from razor_recover.synthetic.constants import (
         CURRENCIES, GATEWAYS, INDUSTRIES, PAYMENT_METHODS, FAILURE_CATEGORIES,
     )
     return (

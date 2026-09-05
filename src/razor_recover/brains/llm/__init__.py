@@ -4,8 +4,8 @@ Public exports for the reusable decision component. See individual modules for
 provider isolation, prompt construction, schemas and orchestration.
 """
 
-from src.razor_recover.brains.llm.agent import DecisionAgent, parse_decision
-from src.razor_recover.brains.llm.exceptions import (
+from razor_recover.brains.llm.agent import DecisionAgent, parse_decision
+from razor_recover.brains.llm.exceptions import (
     InvalidAgentInputError,
     InvalidDecisionError,
     LLMError,
@@ -14,12 +14,12 @@ from src.razor_recover.brains.llm.exceptions import (
     LLMTimeoutError,
     LLMProviderUnavailableError,
 )
-from src.razor_recover.brains.llm.providers import (
+from razor_recover.brains.llm.providers import (
     LLMProvider,
     OllamaProvider,
     create_llm_provider,
 )
-from src.razor_recover.brains.llm.schemas import (
+from razor_recover.brains.llm.schemas import (
     AgentDecision,
     AllowedAction,
     CustomerSnapshot,
@@ -27,7 +27,7 @@ from src.razor_recover.brains.llm.schemas import (
     MerchantSnapshot,
     TransactionSnapshot,
 )
-from src.razor_recover.brains.llm.service import DecisionAgentService
+from razor_recover.brains.llm.service import DecisionAgentService
 
 __all__ = [
     "DecisionAgent",

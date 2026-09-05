@@ -15,9 +15,9 @@ from __future__ import annotations
 import logging
 from typing import Sequence
 
-from src.razor_recover.core.logger import get_logger
-from src.razor_recover.shield.rules import PolicyRule
-from src.razor_recover.shield.schemas import (
+from razor_recover.core.logger import get_logger
+from razor_recover.shield.rules import PolicyRule
+from razor_recover.shield.schemas import (
     EvaluationContext,
     PolicyDecisionType,
     RuleDisposition,

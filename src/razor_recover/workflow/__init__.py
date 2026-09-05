@@ -5,7 +5,7 @@ a single failed payment. The API layer is intentionally thin; all decision work
 happens here behind the :class:`RecoveryOrchestrator`.
 """
 
-from src.razor_recover.workflow.exceptions import (
+from razor_recover.workflow.exceptions import (
     LLMStageError,
     MLStageError,
     MerchantNotFoundError,
@@ -14,18 +14,18 @@ from src.razor_recover.workflow.exceptions import (
     WorkflowError,
     WorkflowStageError,
 )
-from src.razor_recover.workflow.orchestrator import RecoveryOrchestrator
-from src.razor_recover.workflow.ports import (
+from razor_recover.workflow.orchestrator import RecoveryOrchestrator
+from razor_recover.workflow.ports import (
     AgentServicePort,
     MerchantPolicyProviderPort,
     PredictionServicePort,
     RagServicePort,
 )
-from src.razor_recover.workflow.policy import (
+from razor_recover.workflow.policy import (
     DefaultMerchantPolicyProvider,
     MerchantPolicyProvider,
 )
-from src.razor_recover.workflow.schemas import EvaluateRequest, EvaluateResponse
+from razor_recover.workflow.schemas import EvaluateRequest, EvaluateResponse
 
 __all__ = [
     "RecoveryOrchestrator",

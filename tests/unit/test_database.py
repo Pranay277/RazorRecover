@@ -6,10 +6,10 @@ from decimal import Decimal
 import pytest
 from sqlalchemy import inspect
 
-from src.razor_recover.core.database import Base, get_db
-from src.razor_recover.db.models.customer import Customer
-from src.razor_recover.db.models.merchant import Merchant
-from src.razor_recover.db.models.transaction import Transaction
+from razor_recover.core.database import Base, get_db
+from razor_recover.db.models.customer import Customer
+from razor_recover.db.models.merchant import Merchant
+from razor_recover.db.models.transaction import Transaction
 
 
 EXPECTED_TABLES = {

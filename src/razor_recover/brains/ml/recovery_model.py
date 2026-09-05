@@ -5,7 +5,7 @@ Input : feature vector built from evaluation-time information (see
 payment is eventually recovered.
 """
 
-from src.razor_recover.brains.ml.model_base import (
+from razor_recover.brains.ml.model_base import (
     BaseScoringModel,
     RecoveryPrediction,
 )

@@ -15,16 +15,16 @@ import sys
 from pathlib import Path
 
 # Ensure the project ``src`` tree is importable when run as a plain script.
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+SRC_DIR = Path(__file__).resolve().parents[1] / "src"
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
 
-from src.razor_recover.brains.rag.embeddings import create_embedding_provider
-from src.razor_recover.brains.rag.exceptions import RAGError
-from src.razor_recover.brains.rag.seeder import seed_knowledge_base
-from src.razor_recover.brains.rag.vector_store import create_vector_store
-from src.razor_recover.config import get_settings
-from src.razor_recover.core.logger import configure_logging, get_logger
+from razor_recover.brains.rag.embeddings import create_embedding_provider
+from razor_recover.brains.rag.exceptions import RAGError
+from razor_recover.brains.rag.seeder import seed_knowledge_base
+from razor_recover.brains.rag.vector_store import create_vector_store
+from razor_recover.config import get_settings
+from razor_recover.core.logger import configure_logging, get_logger
 
 logger = get_logger("script.seed_vector_db")
 

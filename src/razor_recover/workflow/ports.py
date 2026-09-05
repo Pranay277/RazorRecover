@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from src.razor_recover.brains.llm.schemas import (
+from razor_recover.brains.llm.schemas import (
     AgentDecision,
     DecisionRequest,
 )

@@ -6,12 +6,12 @@ not interfere with other collections, and always deletes it in teardown.
 
 import pytest
 
-from src.razor_recover.brains.rag.embeddings import LocalHashEmbeddingProvider
-from src.razor_recover.brains.rag.knowledge_base import load_documents
-from src.razor_recover.brains.rag.schemas import KnowledgeDocument
-from src.razor_recover.brains.rag.seeder import seed_knowledge_base
-from src.razor_recover.brains.rag.service import RAGService
-from src.razor_recover.brains.rag.vector_store import QdrantVectorStore
+from razor_recover.brains.rag.embeddings import LocalHashEmbeddingProvider
+from razor_recover.brains.rag.knowledge_base import load_documents
+from razor_recover.brains.rag.schemas import KnowledgeDocument
+from razor_recover.brains.rag.seeder import seed_knowledge_base
+from razor_recover.brains.rag.service import RAGService
+from razor_recover.brains.rag.vector_store import QdrantVectorStore
 
 
 @pytest.fixture
@@ -79,7 +79,7 @@ def test_seed_and_retrieve_against_qdrant(qdrant_service):
 
 def test_seed_full_demo_knowledge_base_against_qdrant(qdrant_service):
     svc = qdrant_service
-    from src.razor_recover.brains.rag.knowledge_base import DEMO_KNOWLEDGE_DOCUMENTS
+    from razor_recover.brains.rag.knowledge_base import DEMO_KNOWLEDGE_DOCUMENTS
 
     seed_knowledge_base(svc.store, svc.embeddings, svc.collection, documents=DEMO_KNOWLEDGE_DOCUMENTS)
     assert svc.store.count(svc.collection) >= len(DEMO_KNOWLEDGE_DOCUMENTS)

@@ -7,15 +7,15 @@ manually / in an environment with Ollama running.
 
 import pytest
 
-from src.razor_recover.brains.llm.agent import DecisionAgent
-from src.razor_recover.brains.llm.schemas import (
+from razor_recover.brains.llm.agent import DecisionAgent
+from razor_recover.brains.llm.schemas import (
     AllowedAction,
     CustomerSnapshot,
     DecisionRequest,
     MerchantSnapshot,
     TransactionSnapshot,
 )
-from src.razor_recover.brains.llm.service import DecisionAgentService
+from razor_recover.brains.llm.service import DecisionAgentService
 
 
 def _live_provider_or_skip():

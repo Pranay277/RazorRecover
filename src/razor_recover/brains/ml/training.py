@@ -29,13 +29,13 @@ from sklearn.metrics import (
 )
 from sklearn.model_selection import train_test_split
 
-from src.razor_recover.brains.ml import features, targets
-from src.razor_recover.brains.ml.model_base import BaseScoringModel
-from src.razor_recover.brains.ml.recovery_model import RecoveryModel
-from src.razor_recover.brains.ml.risk_model import RiskModel
-from src.razor_recover.core.logger import get_logger
-from src.razor_recover.synthetic import SyntheticDataConfig, generate_dataset
-from src.razor_recover.synthetic.schemas import SyntheticDataset
+from razor_recover.brains.ml import features, targets
+from razor_recover.brains.ml.model_base import BaseScoringModel
+from razor_recover.brains.ml.recovery_model import RecoveryModel
+from razor_recover.brains.ml.risk_model import RiskModel
+from razor_recover.core.logger import get_logger
+from razor_recover.synthetic import SyntheticDataConfig, generate_dataset
+from razor_recover.synthetic.schemas import SyntheticDataset
 
 logger: logging.Logger = get_logger("brains.ml.training")
 

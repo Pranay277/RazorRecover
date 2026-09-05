@@ -18,8 +18,8 @@ from typing import Mapping
 
 import numpy as np
 
-from src.razor_recover.synthetic import constants as c
-from src.razor_recover.synthetic.schemas import SyntheticDataset
+from razor_recover.synthetic import constants as c
+from razor_recover.synthetic.schemas import SyntheticDataset
 
 # ---------------------------------------------------------------------------
 # Explicit feature configuration

@@ -9,9 +9,9 @@ from __future__ import annotations
 import logging
 from typing import Protocol
 
-from src.razor_recover.core.logger import get_logger
-from src.razor_recover.execution.exceptions import NotificationError
-from src.razor_recover.execution.schemas import NotificationResult, NotificationStatus
+from razor_recover.core.logger import get_logger
+from razor_recover.execution.exceptions import NotificationError
+from razor_recover.execution.schemas import NotificationResult, NotificationStatus
 
 logger = get_logger("execution.notification")
 

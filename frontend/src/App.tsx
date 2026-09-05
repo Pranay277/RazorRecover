@@ -1,27 +1,24 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { AppLayout } from '@/components';
-import { PlaceholderPage } from '@/pages';
+import {
+  PlaceholderPage,
+  RecoveryCommandCenter,
+  TransactionsInvestigation,
+} from '@/pages';
 
 export default function App() {
   return (
     <Routes>
       <Route element={<AppLayout />}>
+        <Route index element={<RecoveryCommandCenter />} />
+        <Route path="transactions" element={<TransactionsInvestigation />} />
         <Route
-          index
+          path="transaction-details"
           element={
             <PlaceholderPage
-              title="Overview"
-              description="Recovery Command Center metrics and drill-downs will be implemented here."
-            />
-          }
-        />
-        <Route
-          path="transactions"
-          element={
-            <PlaceholderPage
-              title="Transactions"
-              description="The failed-payments investigation table will be implemented here."
+              title="Transaction Details"
+              description="The full persisted view of a single transaction will be implemented here."
             />
           }
         />
@@ -38,7 +35,7 @@ export default function App() {
           path="audit"
           element={
             <PlaceholderPage
-              title="Audit Logs"
+              title="Audit logs"
               description="The audit trail for recovery decisions and executions will be implemented here."
             />
           }

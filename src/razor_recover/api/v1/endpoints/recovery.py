@@ -8,14 +8,14 @@ business logic lives here.
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from src.razor_recover.api.dependencies import db_session, get_recovery_orchestrator
-from src.razor_recover.workflow.exceptions import (
+from razor_recover.api.dependencies import db_session, get_recovery_orchestrator
+from razor_recover.workflow.exceptions import (
     TransactionNotFoundError,
     WorkflowError,
     WorkflowStageError,
 )
-from src.razor_recover.workflow.orchestrator import RecoveryOrchestrator
-from src.razor_recover.workflow.schemas import EvaluateRequest, EvaluateResponse
+from razor_recover.workflow.orchestrator import RecoveryOrchestrator
+from razor_recover.workflow.schemas import EvaluateRequest, EvaluateResponse
 
 router = APIRouter()
 

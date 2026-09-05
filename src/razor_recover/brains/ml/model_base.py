@@ -14,7 +14,7 @@ import joblib
 import numpy as np
 from pydantic import BaseModel, Field
 
-from src.razor_recover.core.logger import get_logger
+from razor_recover.core.logger import get_logger
 
 logger: logging.Logger = get_logger("brains.ml")
 

@@ -15,11 +15,11 @@ from typing import Any, Mapping
 
 import numpy as np
 
-from src.razor_recover.brains.rag.exceptions import (
+from razor_recover.brains.rag.exceptions import (
     CollectionNotFoundError,
     VectorStoreError,
 )
-from src.razor_recover.core.logger import get_logger
+from razor_recover.core.logger import get_logger
 
 logger: logging.Logger = get_logger("brains.rag.vector_store")
 

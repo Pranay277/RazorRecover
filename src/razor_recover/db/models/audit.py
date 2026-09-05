@@ -5,7 +5,7 @@ from datetime import datetime
 from sqlalchemy import BigInteger, DateTime, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from src.razor_recover.db.models.base import Base, TimestampMixin
+from razor_recover.db.models.base import Base, TimestampMixin
 
 
 class AuditLog(TimestampMixin, Base):

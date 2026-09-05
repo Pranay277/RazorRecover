@@ -7,14 +7,14 @@ from datetime import datetime, timezone
 import pytest
 from pydantic import ValidationError
 
-from src.razor_recover.synthetic import SyntheticDataConfig, generate_dataset
-from src.razor_recover.synthetic.constants import (
+from razor_recover.synthetic import SyntheticDataConfig, generate_dataset
+from razor_recover.synthetic.constants import (
     ATTEMPT_STATUSES,
     DECISION_OUTCOMES,
     FAILURE_CATEGORIES,
     PAYMENT_METHODS,
 )
-from src.razor_recover.synthetic.schemas import SyntheticDataset
+from razor_recover.synthetic.schemas import SyntheticDataset
 
 
 def _small_config(**overrides) -> SyntheticDataConfig:
