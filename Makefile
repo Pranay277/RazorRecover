@@ -1,19 +1,30 @@
-# RazorRecover Makefile
-# Placeholder - common development commands will be added later.
+# RazorRecover development commands
+#
+# Requires: Python 3.10+, Node.js 18+, Docker/Redis for the full stack.
 
-.PHONY: help install run test lint
+.PHONY: install test run celery frontend-install frontend-typecheck frontend-build frontend-dev
 
-help:
-	@echo "RazorRecover Makefile (placeholder)"
+install: ## Install backend dependencies (Python)
+	pip install -r requirements.txt
+	pip install -e .
 
-install:
-	@echo "Install dependencies (not yet configured)"
+test: ## Run the backend test suite (unit + integration; skips unavailable services)
+	pytest
 
-run:
-	@echo "Run application (not yet implemented)"
+run: ## Start the API server on http://localhost:8000
+	uvicorn razor_recover.main:app --app-dir src --reload --port 8000
 
-test:
-	@echo "Run tests (not yet configured)"
+celery: ## Start the async recovery Celery worker (note: --pool=solo is for Windows)
+	celery -A razor_recover.tasks.celery_app:celery_app worker --pool=solo --loglevel=info
 
-lint:
-	@echo "Run linters (not yet configured)"
+frontend-install: ## Install frontend dependencies (npm)
+	cd frontend && npm install
+
+frontend-typecheck: ## Typecheck the frontend
+	cd frontend && npm run typecheck
+
+frontend-build: ## Production-build the frontend
+	cd frontend && npm run build
+
+frontend-dev: ## Start the frontend dev server on http://localhost:5173
+	cd frontend && npm run dev

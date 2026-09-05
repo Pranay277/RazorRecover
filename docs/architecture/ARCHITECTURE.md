@@ -76,6 +76,8 @@ A successful recovery transaction is marked `recovered`. Execution results (`rec
 
 **Audit stage.** Each evaluation appends an `AuditLog` row whose `detail` JSON captures the request id, ML scores, RAG document references, the LLM requested action and rationale, the policy decision/version and reasons, every rule result, and the final execution status/message.
 
+**Async path (Redis + Celery).** The same pipeline runs asynchronously behind `POST /api/v1/recovery/evaluate/async`. The endpoint enqueues a Celery task (`tasks/recovery_task.py` → `recovery.evaluate_async`) which invokes the identical `RecoveryOrchestrator`; it does not re-implement any recovery logic. Redis acts as both broker (`:0`) and result backend (`:1`). Clients poll `GET /api/v1/recovery/tasks/{task_id}` for `PENDING` / `STARTED` / `SUCCESS` / `FAILURE`; polling never enqueues another task.
+
 ## 3. Safety model
 
 - The LLM is advisory only; the shield is deterministic and does not consult the LLM.
@@ -121,9 +123,9 @@ A React 19 + Vite + TypeScript SPA (`frontend/`) consumes the read APIs through 
 - **Recovery Command Center** (`/`) — KPIs, recovery-outcome chart, risk distribution, recovery-probability, insights, recent failed payments.
 - **Transactions Investigation** (`/transactions`) — filterable, paginated table with summary strip.
 - **Transaction Details** (`/transactions/:id`) — overview, failure context, AI analysis, shield decision, recovery history, audit trail, decision timeline.
-- **Audit Logs** (`/audit`) — **in progress**: data hook and filter constants exist; the routed screen is pending (backend API is complete).
+- **Audit Logs** (`/audit`) — paginated, transaction-filterable audit trail of every recovery decision.
 
-The frontend reads persisted data only; it never triggers recovery or mutates state.
+The frontend reads persisted data only. The sole mutation it can initiate is enqueuing a new recovery evaluation ("Evaluate Recovery" on the transaction detail screen), which delegates to the async backend task — it never runs ML/RAG/LLM/policy/execution logic or mutates state itself.
 
 ## 7. Runtime & configuration
 
@@ -138,7 +140,7 @@ The frontend reads persisted data only; it never triggers recovery or mutates st
   ```
 
   If the live collection was ever created at a different dimension, re-run the seed to rebuild it; no other code change is required.
-- Placeholder scaffolding that this repository does **not** yet implement: `fetchers/*` (context fetchers beyond DB models), `core/redis.py`, `core/security.py`, a production Dockerfile, and real CI/deploy workflows (`Makefile` and `.github/workflows/` remain placeholders).
+- Placeholder scaffolding that this repository does **not** yet implement: `fetchers/*` (context fetchers beyond DB models), `core/redis.py` (direct Redis client wrapper — Redis is currently consumed only through Celery in `tasks/`), and `core/security.py`. There is no production container image or deployment pipeline: CI (`.github/workflows/ci.yml`) runs the backend test suite and the frontend typecheck/build, and nothing is deployed from this repository.
 
 ## 8. Technology choices
 
@@ -146,6 +148,7 @@ The frontend reads persisted data only; it never triggers recovery or mutates st
 | --- | --- |
 | API | FastAPI (Uvicorn) |
 | Persistence | PostgreSQL + SQLAlchemy 2 / Alembic |
+| Async workflow | Redis (Celery broker `:0` + result backend `:1`) + Celery (`tasks/`) |
 | ML | scikit-learn (logistic regression, explicit features, joblib artifacts) |
 | Vector store / RAG | Qdrant; hash-based local embeddings (default) or Ollama embeddings |
 | LLM | Ollama (llama3) behind a provider protocol |
