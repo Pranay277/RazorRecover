@@ -26,9 +26,11 @@ function buildParams(applied: AppliedFilters, offset: number, limit: number): Tr
   if (applied.search) {
     params.search = applied.search;
   }
-  if (applied.date) {
-    params.created_from = applied.date;
-    params.created_to = applied.date;
+  if (applied.attempted_from) {
+    params.attempted_from = applied.attempted_from;
+  }
+  if (applied.attempted_to) {
+    params.attempted_to = applied.attempted_to;
   }
   return params;
 }

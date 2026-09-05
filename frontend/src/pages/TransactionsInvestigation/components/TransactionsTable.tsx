@@ -38,7 +38,7 @@ export function TransactionsTable({ items }: TransactionsTableProps) {
           <THeadCell>AI Recommendation</THeadCell>
           <THeadCell>Shield Decision</THeadCell>
           <THeadCell>Gateway</THeadCell>
-          <THeadCell>Created</THeadCell>
+          <THeadCell>Attempted</THeadCell>
           <THeadCell className={styles.chevronHead} aria-hidden="true" />
         </TRow>
       </THead>
@@ -75,7 +75,7 @@ export function TransactionsTable({ items }: TransactionsTableProps) {
                 <StatusBadge {...shieldBadge(transaction.latest_decision?.outcome)} />
               </TCell>
               <TCell>{transaction.gateway ?? '—'}</TCell>
-              <TCell mono>{formatDateTimeCompact(transaction.created_at)}</TCell>
+              <TCell mono>{formatDateTimeCompact(transaction.attempted_at)}</TCell>
               <TCell className={styles.chevronCell}>
                 <svg
                   className={styles.chevron}

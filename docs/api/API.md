@@ -86,8 +86,8 @@ Query parameters:
 | `gateway` | string | Gateway name |
 | `failure_code` | string | Failure category |
 | `search` | string | Free-text against external id / customer external id (case-insensitive, 1–128 chars) |
-| `created_from` | date | Inclusive lower bound (`YYYY-MM-DD`) |
-| `created_to` | date | Inclusive upper bound |
+| `attempted_from` | date | Inclusive lower bound on `attempted_at` (`YYYY-MM-DD`) |
+| `attempted_to` | date | Inclusive upper bound on `attempted_at` |
 | `limit` | int | Default `50`, max `200` |
 | `offset` | int | Default `0` |
 

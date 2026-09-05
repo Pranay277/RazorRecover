@@ -273,6 +273,36 @@ def test_load_wrong_type_raises(tmp_path):
         RecoveryModel.load(rep.risk_artifact_path, expected_type="recovery")
 
 
+def test_default_artifact_dir_points_to_repository_root_models():
+    from pathlib import Path
+
+    from razor_recover.brains.ml.service import PredictionService
+    from razor_recover.brains.ml.training import (
+        DEFAULT_ARTIFACT_DIR,
+        RECOVERY_ARTIFACT_NAME,
+        RISK_ARTIFACT_NAME,
+    )
+
+    repo_models = Path(__file__).resolve().parents[2] / "models"
+    assert DEFAULT_ARTIFACT_DIR == repo_models
+    assert DEFAULT_ARTIFACT_DIR.name == "models"
+
+    svc = PredictionService()
+    assert svc._risk_path == repo_models / RISK_ARTIFACT_NAME
+    assert svc._recovery_path == repo_models / RECOVERY_ARTIFACT_NAME
+
+
+def test_prediction_service_default_resolves_existing_artifacts():
+    from razor_recover.brains.ml.service import PredictionService
+    from razor_recover.brains.ml.training import DEFAULT_ARTIFACT_DIR
+
+    if not (DEFAULT_ARTIFACT_DIR / "risk_model.joblib").exists() or not (
+        DEFAULT_ARTIFACT_DIR / "recovery_model.joblib"
+    ).exists():
+        pytest.skip("Model artifacts not present - skipping availability check")
+    assert PredictionService().is_available()
+
+
 # ---------------------------------------------------------------------------
 # Basic evaluation
 # ---------------------------------------------------------------------------

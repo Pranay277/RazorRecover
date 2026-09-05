@@ -32,8 +32,8 @@ def list_transactions(
     gateway: str | None = None,
     failure_code: str | None = None,
     search: str | None = Query(default=None, min_length=1, max_length=128),
-    created_from: date | None = Query(default=None),
-    created_to: date | None = Query(default=None),
+    attempted_from: date | None = Query(default=None),
+    attempted_to: date | None = Query(default=None),
     limit: int = Query(default=50, ge=1, le=200),
     offset: int = Query(default=0, ge=0),
     db: Session = Depends(db_session),
@@ -49,9 +49,9 @@ def list_transactions(
         gateway=gateway,
         failure_code=failure_code,
         search=search,
-        created_from=_day_start(created_from) if created_from else None,
-        created_to=(
-            _day_start(created_to) + timedelta(days=1) if created_to else None
+        attempted_from=_day_start(attempted_from) if attempted_from else None,
+        attempted_to=(
+            _day_start(attempted_to) + timedelta(days=1) if attempted_to else None
         ),
         limit=limit,
         offset=offset,

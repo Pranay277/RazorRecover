@@ -1,5 +1,5 @@
 import { StatusBadge } from '@/components';
-import { attemptBadge, humanizeAction, shieldBadge } from '@/utils';
+import { executionStatusBadge, humanizeAction, shieldBadge } from '@/utils';
 import type { AuditLogItem } from '@/types';
 
 import styles from './AuditLogDetail.module.css';
@@ -42,7 +42,7 @@ export function AuditLogDetail({ event }: { event: AuditLogItem }) {
         {execution ? (
           <div className={styles.outlineItem}>
             <span className={styles.outlineLabel}>Execution Status</span>
-            <StatusBadge {...attemptBadge(execution)} />
+            <StatusBadge {...executionStatusBadge(execution)} />
           </div>
         ) : null}
         {!aiAction && !policy && !execution && (

@@ -40,6 +40,9 @@ export function riskBadge(risk: string | number | null | undefined) {
 // -- shield outcome ----------------------------------------------------------
 
 const OUTCOME_BADGE: Record<string, { label: string; tone: BadgeTone }> = {
+  ALLOW: { label: 'Allowed', tone: 'success' },
+  BLOCK: { label: 'Blocked', tone: 'danger' },
+  REVIEW: { label: 'Review', tone: 'warning' },
   authorized: { label: 'Allowed', tone: 'success' },
   review: { label: 'Review', tone: 'warning' },
   blocked: { label: 'Blocked', tone: 'danger' },
@@ -56,6 +59,10 @@ export function shieldBadge(outcome: string | null | undefined) {
 // -- recovery attempts -------------------------------------------------------
 
 const ATTEMPT_BADGE: Record<string, { label: string; tone: BadgeTone }> = {
+  recovered: { label: 'Recovered', tone: 'success' },
+  scheduled: { label: 'Scheduled', tone: 'info' },
+  sent: { label: 'Sent', tone: 'info' },
+  timeout: { label: 'Timeout', tone: 'warning' },
   success: { label: 'Recovered', tone: 'success' },
   failed: { label: 'Failed', tone: 'danger' },
   running: { label: 'Running', tone: 'info' },

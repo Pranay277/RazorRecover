@@ -21,8 +21,8 @@ export interface TransactionListParams {
   gateway?: string;
   failure_code?: string;
   search?: string;
-  created_from?: string;
-  created_to?: string;
+  attempted_from?: string;
+  attempted_to?: string;
   limit?: number;
   offset?: number;
 }

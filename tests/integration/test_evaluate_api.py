@@ -8,6 +8,7 @@ thin API client.
 No Ollama, Qdrant, or real payment systems are required.
 """
 
+from datetime import datetime, timezone
 from decimal import Decimal
 from types import SimpleNamespace
 
@@ -309,6 +310,37 @@ def test_audit_and_attempt_records_created(sqlite_session):
     attempt = sqlite_session.query(RecoveryAttempt).one()
     assert attempt.attempt_type == "RETRY_NOW"
     assert attempt.status == "recovered"
+
+
+def test_new_attempt_links_to_the_authorizing_decision(sqlite_session):
+    # A prior decision must not be referenced by an attempt created in a later
+    # evaluation: the attempt belongs to the decision that authorized it.
+    tx = _seed_transaction(sqlite_session)
+    prior = RecoveryDecision(
+        transaction_id=tx.id,
+        action="retry",
+        outcome="authorized",
+        risk_score=Decimal("0.2500"),
+        decided_at=datetime.now(timezone.utc),
+    )
+    sqlite_session.add(prior)
+    sqlite_session.flush()
+
+    orch, _ = _build_orchestrator(
+        sqlite_session, agent=FakeAgent(AllowedAction.RETRY_NOW)
+    )
+    resp = orch.evaluate(sqlite_session, tx.id)
+    sqlite_session.flush()
+
+    decision = (
+        sqlite_session.query(RecoveryDecision)
+        .order_by(RecoveryDecision.id.desc())
+        .first()
+    )
+    attempt = sqlite_session.query(RecoveryAttempt).one()
+    assert resp.audit_id is not None
+    assert decision.id != prior.id
+    assert attempt.decision_id == decision.id
 
 
 def test_execution_cannot_bypass_policy_decision(sqlite_session):
