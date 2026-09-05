@@ -1,6 +1,7 @@
 """RazorRecover – FastAPI application entry point."""
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from razor_recover.api.v1.router import api_router
 from razor_recover.config import get_settings
@@ -14,6 +15,13 @@ def create_app() -> FastAPI:
         title=settings.app_name,
         docs_url="/docs" if settings.debug else None,
         redoc_url="/redoc" if settings.debug else None,
+    )
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_allow_origins,
+        allow_methods=["GET", "POST"],
+        allow_headers=["Content-Type"],
     )
 
     @app.get("/")
