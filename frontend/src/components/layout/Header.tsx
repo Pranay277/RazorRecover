@@ -32,7 +32,7 @@ const META_BY_PATH: Array<[RegExp, HeaderMeta]> = [
       subtitle: 'Investigate payment failures and recovery decisions',
     },
   ],
-  [/^\/audit/, { title: 'Audit logs' }],
+  [/^\/audit/, { title: 'Audit logs', subtitle: 'Inspect recovery workflow events and decision outcomes' }],
   [/^\//, { title: 'RazorRecover' }],
 ];
 

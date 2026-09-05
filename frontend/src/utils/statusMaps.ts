@@ -69,6 +69,23 @@ export function attemptBadge(status: string | null | undefined) {
   return { label: 'Not evaluated', tone: 'neutral' as BadgeTone };
 }
 
+// -- execution status (recorded on audit payloads) ---------------------------
+
+const EXECUTION_BADGE: Record<string, { label: string; tone: BadgeTone }> = {
+  recovered: { label: 'Recovered', tone: 'success' },
+  failed: { label: 'Failed', tone: 'danger' },
+  scheduled: { label: 'Scheduled', tone: 'info' },
+  sent: { label: 'Sent', tone: 'info' },
+  timeout: { label: 'Timeout', tone: 'warning' },
+};
+
+export function executionStatusBadge(status: string | null | undefined) {
+  if (status && EXECUTION_BADGE[status]) {
+    return EXECUTION_BADGE[status];
+  }
+  return { label: status ?? '—', tone: 'neutral' as BadgeTone };
+}
+
 // -- transaction status ------------------------------------------------------
 
 const STATUS_BADGE: Record<string, { label: string; tone: BadgeTone }> = {

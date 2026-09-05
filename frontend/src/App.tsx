@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { AppLayout } from '@/components';
 import {
+  AuditLogs,
   PlaceholderPage,
   RecoveryCommandCenter,
   TransactionDetails,
@@ -24,15 +25,7 @@ export default function App() {
           }
         />
         <Route path="transactions/:transactionId" element={<TransactionDetails />} />
-        <Route
-          path="audit"
-          element={
-            <PlaceholderPage
-              title="Audit logs"
-              description="The audit trail for recovery decisions and executions will be implemented here."
-            />
-          }
-        />
+        <Route path="audit" element={<AuditLogs />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
