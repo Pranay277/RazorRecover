@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     app_env: str = "development"
     debug: bool = False
 
+    # Browser origins allowed to call the API (local development).
+    cors_allow_origins: list[str] = ["http://localhost:5173"]
+
     # PostgreSQL
     database_url: str = (
         "postgresql+psycopg://razor:razor_dev_password@localhost:5433/razorrecover"
