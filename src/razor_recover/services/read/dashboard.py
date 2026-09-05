@@ -53,8 +53,8 @@ class DashboardReadService:
         gateway: str | None = None,
         failure_code: str | None = None,
         search: str | None = None,
-        created_from: datetime | None = None,
-        created_to: datetime | None = None,
+        attempted_from: datetime | None = None,
+        attempted_to: datetime | None = None,
         limit: int = 50,
         offset: int = 0,
     ) -> TransactionListResponse:
@@ -67,8 +67,8 @@ class DashboardReadService:
             gateway=gateway,
             failure_code=failure_code,
             search=search,
-            created_from=created_from,
-            created_to=created_to,
+            attempted_from=attempted_from,
+            attempted_to=attempted_to,
         )
         stmt = (
             select(Transaction)
@@ -86,8 +86,8 @@ class DashboardReadService:
             gateway=gateway,
             failure_code=failure_code,
             search=search,
-            created_from=created_from,
-            created_to=created_to,
+            attempted_from=attempted_from,
+            attempted_to=attempted_to,
         )
         rows = session.scalars(stmt).all()
 
@@ -247,7 +247,7 @@ class DashboardReadService:
     @staticmethod
     def _apply_filters(stmt, *, status, merchant_id, customer_id,
                        payment_method, gateway, failure_code,
-                       search=None, created_from=None, created_to=None):
+                       search=None, attempted_from=None, attempted_to=None):
         if status is not None:
             stmt = stmt.where(Transaction.status == status)
         if merchant_id is not None:
@@ -269,10 +269,10 @@ class DashboardReadService:
                 Transaction.external_id.ilike(term)
                 | Transaction.customer_id.in_(customer_ids)
             )
-        if created_from is not None:
-            stmt = stmt.where(Transaction.created_at >= created_from)
-        if created_to is not None:
-            stmt = stmt.where(Transaction.created_at < created_to)
+        if attempted_from is not None:
+            stmt = stmt.where(Transaction.attempted_at >= attempted_from)
+        if attempted_to is not None:
+            stmt = stmt.where(Transaction.attempted_at < attempted_to)
         return stmt
 
     def _count_transactions(self, session: Session, **filters) -> int:

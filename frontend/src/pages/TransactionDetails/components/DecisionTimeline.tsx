@@ -109,12 +109,17 @@ function toneForOutcome(tone: string): string {
 
 function toneForAttempt(attempt: RecoveryAttemptRead): string {
   switch (attempt.status) {
+    case 'recovered':
     case 'success':
       return styles.toneSuccess;
+    case 'scheduled':
+    case 'running':
+    case 'sent':
+      return styles.toneInfo;
+    case 'timeout':
+      return styles.toneWarning;
     case 'failed':
       return styles.toneDanger;
-    case 'running':
-      return styles.toneInfo;
     default:
       return styles.toneNeutral;
   }

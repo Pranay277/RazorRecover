@@ -45,7 +45,8 @@ export interface AppliedFilters {
   status: string;
   payment_method: string;
   gateway: string;
-  date: string;
+  attempted_from: string;
+  attempted_to: string;
 }
 
 export const EMPTY_FILTERS: AppliedFilters = {
@@ -53,7 +54,8 @@ export const EMPTY_FILTERS: AppliedFilters = {
   status: '',
   payment_method: '',
   gateway: '',
-  date: '',
+  attempted_from: '',
+  attempted_to: '',
 };
 
 export const PAGE_SIZE = 10;

@@ -22,7 +22,8 @@ export function FilterBar({ draft, onChange, onApply, onClear }: FilterBarProps)
     Boolean(draft.status) ||
     Boolean(draft.payment_method) ||
     Boolean(draft.gateway) ||
-    Boolean(draft.date);
+    Boolean(draft.attempted_from) ||
+    Boolean(draft.attempted_to);
 
   return (
     <form
@@ -114,15 +115,28 @@ export function FilterBar({ draft, onChange, onApply, onClear }: FilterBarProps)
       </div>
 
       <div className={styles.field}>
-        <label className={styles.fieldLabel} htmlFor="tx-date">
-          Date Range
+        <label className={styles.fieldLabel} htmlFor="tx-attempted-from">
+          From
         </label>
         <input
-          id="tx-date"
+          id="tx-attempted-from"
           className={styles.dateInput}
           type="date"
-          value={draft.date}
-          onChange={(event) => onChange({ date: event.target.value })}
+          value={draft.attempted_from}
+          onChange={(event) => onChange({ attempted_from: event.target.value })}
+        />
+      </div>
+
+      <div className={styles.field}>
+        <label className={styles.fieldLabel} htmlFor="tx-attempted-to">
+          To
+        </label>
+        <input
+          id="tx-attempted-to"
+          className={styles.dateInput}
+          type="date"
+          value={draft.attempted_to}
+          onChange={(event) => onChange({ attempted_to: event.target.value })}
         />
       </div>
 

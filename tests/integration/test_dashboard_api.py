@@ -114,7 +114,7 @@ def _seed(session: Session, *, audits: bool = True, attempts: bool = True,
 
 
 def _seed_dated(session: Session):
-    """Seed transactions with controlled created_at values for date-range tests."""
+    """Seed transactions with controlled attempted_at values for date-range tests."""
     merchant = Merchant(external_id="m-2", name="Acme Corp", industry="retail")
     customer = Customer(external_id="c-2", name="Jane Doe", email="jane@example.com")
     session.add_all([merchant, customer])
@@ -324,29 +324,79 @@ def test_list_transactions_search_partial_and_case_insensitive(api):
     assert resp.json()  # JSON parseable
 
 
-def test_list_transactions_created_date_range(api):
+def test_list_transactions_attempted_date_range(api):
     session = api._session  # type: ignore[attr-defined]
     _seed_dated(session)
 
     jan = api.get("/api/v1/transactions",
-                  params={"created_from": "2026-01-01", "created_to": "2026-01-31"})
+                  params={"attempted_from": "2026-01-01", "attempted_to": "2026-01-31"})
     assert [t["external_id"] for t in jan.json()["items"]] == ["s-tx-1"]
     assert jan.json()["total"] == 1
 
     single_day = api.get("/api/v1/transactions",
-                         params={"created_from": "2026-02-10",
-                                 "created_to": "2026-02-10"})
+                         params={"attempted_from": "2026-02-10",
+                                 "attempted_to": "2026-02-10"})
     assert [t["external_id"] for t in single_day.json()["items"]] == ["s-tx-2"]
     assert single_day.json()["total"] == 1
 
     open_ended = api.get("/api/v1/transactions",
-                         params={"created_from": "2026-03-01"})
+                         params={"attempted_from": "2026-03-01"})
     assert [t["external_id"] for t in open_ended.json()["items"]] == ["s-tx-3"]
     assert open_ended.json()["total"] == 1
 
     all_dates = api.get("/api/v1/transactions",
-                        params={"created_to": "2026-04-01"})
+                        params={"attempted_to": "2026-04-01"})
     assert all_dates.json()["total"] == 3
+
+
+def test_list_transactions_attempted_date_range_empty(api):
+    session = api._session  # type: ignore[attr-defined]
+    _seed_dated(session)
+
+    no_hits = api.get("/api/v1/transactions",
+                      params={"attempted_from": "2025-12-31",
+                              "attempted_to": "2025-12-31"})
+    assert no_hits.status_code == 200
+    assert no_hits.json()["total"] == 0
+    assert no_hits.json()["items"] == []
+
+
+def test_list_transactions_attempted_date_range_with_pagination(api):
+    session = api._session  # type: ignore[attr-defined]
+    _seed(session)
+
+    resp = api.get("/api/v1/transactions",
+                   params={"attempted_from": "2026-01-01",
+                           "attempted_to": "2026-03-31",
+                           "limit": 1, "offset": 1})
+    body = resp.json()
+    assert body["total"] == 3          # three 2026 tx-1..3 attempted_at values
+    assert len(body["items"]) == 1
+    assert body["items"][0]["external_id"] == "tx-2"
+
+
+def test_list_transactions_status_filter_unaffected_by_date_rename(api):
+    session = api._session  # type: ignore[attr-defined]
+    _seed(session)
+
+    failed = api.get("/api/v1/transactions",
+                     params={"status": "failed",
+                             "attempted_from": "2026-01-01",
+                             "attempted_to": "2026-03-31"})
+    assert failed.json()["total"] == 2  # tx-1 and tx-3 are failed
+
+    gateway_and_method = api.get("/api/v1/transactions",
+                                 params={"gateway": "razorpay",
+                                         "payment_method": "upi",
+                                         "attempted_from": "2026-01-01",
+                                         "attempted_to": "2026-03-31"})
+    assert [t["external_id"] for t in gateway_and_method.json()["items"]] == ["tx-2"]
+
+    search = api.get("/api/v1/transactions",
+                     params={"search": "c-1",
+                             "attempted_from": "2026-01-01",
+                             "attempted_to": "2026-03-31"})
+    assert search.json()["total"] == 3
 
 
 # ---------------------------------------------------------------------------
@@ -514,7 +564,7 @@ def test_read_endpoints_do_not_mutate_database(api):
     tx_id = session.query(Transaction).filter_by(external_id="tx-1").one().id
     api.get("/api/v1/transactions")
     api.get("/api/v1/transactions", params={"status": "failed"})
-    api.get("/api/v1/transactions", params={"search": "tx", "created_from": "2026-01-01"})
+    api.get("/api/v1/transactions", params={"search": "tx", "attempted_from": "2026-01-01"})
     api.get(f"/api/v1/transactions/{tx_id}")
     api.get("/api/v1/summary")
     api.get("/api/v1/audit")

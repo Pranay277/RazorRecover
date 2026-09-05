@@ -124,10 +124,13 @@ class RecoveryOrchestrator:
         )
         policy_decision = self._authorize(shield_ctx)
 
+        decision_id = self._persist_decision(session, transaction, agent_decision, policy_decision)
+
         execution = None
         if policy_decision.decision == PolicyDecisionType.ALLOW:
             execution = self.recovery_service.execute(
                 decision=policy_decision,
+                decision_id=decision_id,
                 session=session,
                 transaction=transaction,
             )
@@ -142,7 +145,6 @@ class RecoveryOrchestrator:
                 transaction.id, policy_decision.decision.value,
             )
 
-        decision_id = self._persist_decision(session, transaction, agent_decision, policy_decision)
         audit_id = self._audit(
             session, transaction, agent_decision, policy_decision, execution,
             rag_result, risk, recovery, rid,

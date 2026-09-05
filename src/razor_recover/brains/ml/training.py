@@ -39,8 +39,8 @@ from razor_recover.synthetic.schemas import SyntheticDataset
 
 logger: logging.Logger = get_logger("brains.ml.training")
 
-# Default (git-ignored) artifact directory.
-DEFAULT_ARTIFACT_DIR = Path(__file__).resolve().parents[3] / "models"
+# Default (git-ignored) artifact directory at the repository root.
+DEFAULT_ARTIFACT_DIR = Path(__file__).resolve().parents[4] / "models"
 
 RISK_ARTIFACT_NAME = "risk_model.joblib"
 RECOVERY_ARTIFACT_NAME = "recovery_model.joblib"

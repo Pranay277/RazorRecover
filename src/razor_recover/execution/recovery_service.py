@@ -66,6 +66,7 @@ class RecoveryService:
         session: Session,
         transaction: Transaction,
         reference: str | None = None,
+        decision_id: int | None = None,
     ) -> ExecutionResult:
         """Execute an authorized action; raises if the decision is not ALLOW."""
         if decision.decision != PolicyDecisionType.ALLOW:
@@ -96,7 +97,9 @@ class RecoveryService:
         started = datetime.now(timezone.utc)
         attempt = RecoveryAttempt(
             transaction_id=transaction.id,
-            decision_id=self._latest_decision_id(session, transaction.id),
+            decision_id=decision_id
+            if decision_id is not None
+            else self._latest_decision_id(session, transaction.id),
             status="pending",
             attempt_type=final_action,
             started_at=started,
