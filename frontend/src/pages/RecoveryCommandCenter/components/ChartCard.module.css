@@ -1,0 +1,9 @@
+.card {
+  display: flex;
+  flex-direction: column;
+}
+
+.body {
+  flex: 1;
+  padding: var(--space-3) var(--space-4) var(--space-4);
+}

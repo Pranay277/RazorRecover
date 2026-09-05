@@ -7,8 +7,8 @@ independent of embedding / storage so it is easy to unit test.
 
 from __future__ import annotations
 
-from src.razor_recover.brains.rag.exceptions import DocumentError
-from src.razor_recover.brains.rag.schemas import DocumentChunk, KnowledgeDocument
+from razor_recover.brains.rag.exceptions import DocumentError
+from razor_recover.brains.rag.schemas import DocumentChunk, KnowledgeDocument
 
 DEFAULT_MAX_CHARS = 500
 DEFAULT_OVERLAP_CHARS = 60

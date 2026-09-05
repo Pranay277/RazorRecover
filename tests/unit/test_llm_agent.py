@@ -9,22 +9,22 @@ import json
 import pytest
 from pydantic import ValidationError
 
-from src.razor_recover.brains.llm.agent import DecisionAgent, extract_json, parse_decision
-from src.razor_recover.brains.llm.exceptions import (
+from razor_recover.brains.llm.agent import DecisionAgent, extract_json, parse_decision
+from razor_recover.brains.llm.exceptions import (
     InvalidDecisionError,
     LLMProviderError,
     LLMProviderUnavailableError,
     LLMTimeoutError,
 )
-from src.razor_recover.brains.llm.providers import LLMProvider
-from src.razor_recover.brains.llm.prompts import (
+from razor_recover.brains.llm.providers import LLMProvider
+from razor_recover.brains.llm.prompts import (
     SYSTEM_PROMPT,
     build_messages,
     build_user_prompt,
     format_ml_scores,
     format_rag_context,
 )
-from src.razor_recover.brains.llm.schemas import (
+from razor_recover.brains.llm.schemas import (
     AgentDecision,
     AllowedAction,
     CustomerSnapshot,
@@ -32,7 +32,7 @@ from src.razor_recover.brains.llm.schemas import (
     MerchantSnapshot,
     TransactionSnapshot,
 )
-from src.razor_recover.brains.rag.schemas import RetrievalHit, RetrievalResult
+from razor_recover.brains.rag.schemas import RetrievalHit, RetrievalResult
 
 
 # ---------------------------------------------------------------------------

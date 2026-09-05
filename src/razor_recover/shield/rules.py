@@ -14,8 +14,8 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from src.razor_recover.brains.llm.schemas import AllowedAction
-from src.razor_recover.shield.schemas import (
+from razor_recover.brains.llm.schemas import AllowedAction
+from razor_recover.shield.schemas import (
     EvaluationContext,
     MerchantPolicy,
     RuleDisposition,

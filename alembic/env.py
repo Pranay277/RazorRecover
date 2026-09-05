@@ -1,13 +1,20 @@
 """Alembic migration environment for RazorRecover."""
 
+import sys
 from logging.config import fileConfig
+from pathlib import Path
 
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from src.razor_recover.config import get_settings
-from src.razor_recover.core.database import Base
-from src.razor_recover.db import models  # noqa: F401 - register ORM models
+# Ensure the project ``src`` tree is importable when alembic runs from any cwd.
+SRC_DIR = Path(__file__).resolve().parents[1] / "src"
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
+
+from razor_recover.config import get_settings
+from razor_recover.core.database import Base
+from razor_recover.db import models  # noqa: F401 - register ORM models
 
 config = context.config
 

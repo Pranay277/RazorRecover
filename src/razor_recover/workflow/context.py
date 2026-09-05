@@ -10,16 +10,16 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from decimal import Decimal
 
-from src.razor_recover.brains.llm.schemas import (
+from razor_recover.brains.llm.schemas import (
     AgentDecision,
     CustomerSnapshot,
     DecisionRequest,
     MerchantSnapshot,
     TransactionSnapshot,
 )
-from src.razor_recover.db.models.merchant import Merchant
-from src.razor_recover.db.models.transaction import Transaction
-from src.razor_recover.shield.schemas import EvaluationContext, MerchantPolicy
+from razor_recover.db.models.merchant import Merchant
+from razor_recover.db.models.transaction import Transaction
+from razor_recover.shield.schemas import EvaluationContext, MerchantPolicy
 
 SUCCESS_STATUSES = {"recovered", "succeed", "success", "completed"}
 FAILED_STATUSES = {"failed", "declined", "blocked"}

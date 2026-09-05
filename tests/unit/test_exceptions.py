@@ -4,7 +4,7 @@ import pytest
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
 
-from src.razor_recover.core.exceptions import (
+from razor_recover.core.exceptions import (
     ConflictError,
     DatabaseError,
     DatabaseUnavailableError,

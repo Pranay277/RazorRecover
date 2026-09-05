@@ -6,17 +6,17 @@ mapping, and idempotency - all deterministic, no external services.
 
 import pytest
 
-from src.razor_recover.brains.llm.schemas import AllowedAction
-from src.razor_recover.db.models.customer import Customer
-from src.razor_recover.db.models.merchant import Merchant
-from src.razor_recover.db.models.recovery import RecoveryAttempt
-from src.razor_recover.db.models.transaction import Transaction
-from src.razor_recover.execution.exceptions import UnauthorizedExecutionError
-from src.razor_recover.execution.gateway import MockPaymentGateway, create_payment_gateway
-from src.razor_recover.execution.recovery_service import RecoveryService
-from src.razor_recover.execution.retry_service import RetryService
-from src.razor_recover.execution.schemas import ExecutionStatus, GatewayOutcome
-from src.razor_recover.shield.schemas import PolicyDecision, PolicyDecisionType
+from razor_recover.brains.llm.schemas import AllowedAction
+from razor_recover.db.models.customer import Customer
+from razor_recover.db.models.merchant import Merchant
+from razor_recover.db.models.recovery import RecoveryAttempt
+from razor_recover.db.models.transaction import Transaction
+from razor_recover.execution.exceptions import UnauthorizedExecutionError
+from razor_recover.execution.gateway import MockPaymentGateway, create_payment_gateway
+from razor_recover.execution.recovery_service import RecoveryService
+from razor_recover.execution.retry_service import RetryService
+from razor_recover.execution.schemas import ExecutionStatus, GatewayOutcome
+from razor_recover.shield.schemas import PolicyDecision, PolicyDecisionType
 
 
 # ---------------------------------------------------------------------------

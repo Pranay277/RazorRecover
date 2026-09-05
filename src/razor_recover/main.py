@@ -2,8 +2,8 @@
 
 from fastapi import FastAPI
 
-from src.razor_recover.api.v1.router import api_router
-from src.razor_recover.config import get_settings
+from razor_recover.api.v1.router import api_router
+from razor_recover.config import get_settings
 
 
 def create_app() -> FastAPI:

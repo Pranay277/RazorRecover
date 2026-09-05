@@ -6,13 +6,13 @@ not used for inserts because BigInteger surrogate keys do not autoincrement
 there.
 """
 
-from src.razor_recover.synthetic import generate_dataset, write_dataset
-from src.razor_recover.synthetic.config import SyntheticDataConfig
-from src.razor_recover.db.models.customer import Customer
-from src.razor_recover.db.models.decision import RecoveryDecision
-from src.razor_recover.db.models.merchant import Merchant
-from src.razor_recover.db.models.recovery import RecoveryAttempt
-from src.razor_recover.db.models.transaction import Transaction
+from razor_recover.synthetic import generate_dataset, write_dataset
+from razor_recover.synthetic.config import SyntheticDataConfig
+from razor_recover.db.models.customer import Customer
+from razor_recover.db.models.decision import RecoveryDecision
+from razor_recover.db.models.merchant import Merchant
+from razor_recover.db.models.recovery import RecoveryAttempt
+from razor_recover.db.models.transaction import Transaction
 
 
 def _dataset():

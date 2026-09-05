@@ -12,16 +12,16 @@ import logging
 from datetime import datetime, timezone
 from typing import Sequence
 
-from src.razor_recover.brains.llm.schemas import AllowedAction
-from src.razor_recover.core.logger import get_logger
-from src.razor_recover.shield.exceptions import (
+from razor_recover.brains.llm.schemas import AllowedAction
+from razor_recover.core.logger import get_logger
+from razor_recover.shield.exceptions import (
     InvalidPolicyContextError,
     PolicyEvaluationError,
     UnknownRuleError,
 )
-from src.razor_recover.shield.evaluator import evaluate_rules
-from src.razor_recover.shield.rules import PolicyRule, default_rule_set
-from src.razor_recover.shield.schemas import (
+from razor_recover.shield.evaluator import evaluate_rules
+from razor_recover.shield.rules import PolicyRule, default_rule_set
+from razor_recover.shield.schemas import (
     EvaluationContext,
     PolicyDecision,
     PolicyDecisionType,

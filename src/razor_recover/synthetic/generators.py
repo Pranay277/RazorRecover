@@ -9,8 +9,8 @@ import random
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
-from src.razor_recover.synthetic import constants as c
-from src.razor_recover.synthetic.schemas import (
+from razor_recover.synthetic import constants as c
+from razor_recover.synthetic.schemas import (
     SyntheticCustomer,
     SyntheticHistory,
     SyntheticMerchant,

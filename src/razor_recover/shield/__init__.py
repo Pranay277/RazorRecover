@@ -10,19 +10,19 @@ Public API::
     decision = engine.evaluate(context)   # -> PolicyDecision (ALLOW/BLOCK/REVIEW)
 """
 
-from src.razor_recover.shield.evaluator import EvaluationOutcome, evaluate_rules
-from src.razor_recover.shield.exceptions import (
+from razor_recover.shield.evaluator import EvaluationOutcome, evaluate_rules
+from razor_recover.shield.exceptions import (
     InvalidPolicyContextError,
     PolicyError,
     PolicyEvaluationError,
     UnknownRuleError,
 )
-from src.razor_recover.shield.policy_engine import PolicyEngine
-from src.razor_recover.shield.rules import (
+from razor_recover.shield.policy_engine import PolicyEngine
+from razor_recover.shield.rules import (
     PolicyRule,
     default_rule_set,
 )
-from src.razor_recover.shield.schemas import (
+from razor_recover.shield.schemas import (
     EvaluationContext,
     MerchantPolicy,
     PolicyDecision,

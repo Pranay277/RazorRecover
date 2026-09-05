@@ -5,9 +5,9 @@ from sqlalchemy import BigInteger, create_engine, text
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.orm import Session, sessionmaker
 
-from src.razor_recover.config import get_settings
-from src.razor_recover.core.database import Base, get_db
-from src.razor_recover.db import models  # noqa: F401 - register ORM models
+from razor_recover.config import get_settings
+from razor_recover.core.database import Base, get_db
+from razor_recover.db import models  # noqa: F401 - register ORM models
 
 
 # SQLite only auto-increments INTEGER PRIMARY KEY (the rowid alias); our models

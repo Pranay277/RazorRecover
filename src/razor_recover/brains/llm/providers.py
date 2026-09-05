@@ -13,12 +13,12 @@ from typing import Protocol, Sequence
 
 import httpx
 
-from src.razor_recover.brains.llm.exceptions import (
+from razor_recover.brains.llm.exceptions import (
     LLMProviderError,
     LLMProviderUnavailableError,
     LLMTimeoutError,
 )
-from src.razor_recover.core.logger import get_logger
+from razor_recover.core.logger import get_logger
 
 logger: logging.Logger = get_logger("brains.llm.providers")
 

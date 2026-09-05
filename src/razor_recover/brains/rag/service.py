@@ -10,19 +10,19 @@ from __future__ import annotations
 
 import logging
 
-from src.razor_recover.brains.rag.embeddings import (
+from razor_recover.brains.rag.embeddings import (
     EmbeddingProvider,
     create_embedding_provider,
 )
-from src.razor_recover.brains.rag.retriever import Retriever
-from src.razor_recover.brains.rag.schemas import KnowledgeDocument, RetrievalResult
-from src.razor_recover.brains.rag.seeder import seed_knowledge_base
-from src.razor_recover.brains.rag.vector_store import (
+from razor_recover.brains.rag.retriever import Retriever
+from razor_recover.brains.rag.schemas import KnowledgeDocument, RetrievalResult
+from razor_recover.brains.rag.seeder import seed_knowledge_base
+from razor_recover.brains.rag.vector_store import (
     VectorStore,
     create_vector_store,
 )
-from src.razor_recover.config import Settings, get_settings
-from src.razor_recover.core.logger import get_logger
+from razor_recover.config import Settings, get_settings
+from razor_recover.core.logger import get_logger
 
 logger: logging.Logger = get_logger("brains.rag.service")
 

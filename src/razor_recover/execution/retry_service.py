@@ -10,13 +10,13 @@ from __future__ import annotations
 
 import logging
 
-from src.razor_recover.core.logger import get_logger
-from src.razor_recover.execution.gateway import (
+from razor_recover.core.logger import get_logger
+from razor_recover.execution.gateway import (
     MockPaymentGateway,
     PaymentGateway,
     create_payment_gateway,
 )
-from src.razor_recover.execution.schemas import (
+from razor_recover.execution.schemas import (
     ExecutionResult,
     ExecutionStatus,
     GatewayOutcome,

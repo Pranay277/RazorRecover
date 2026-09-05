@@ -7,26 +7,26 @@ are fast, network-free and reproducible.
 import numpy as np
 import pytest
 
-from src.razor_recover.brains.rag.chunking import chunk_document
-from src.razor_recover.brains.rag.embeddings import (
+from razor_recover.brains.rag.chunking import chunk_document
+from razor_recover.brains.rag.embeddings import (
     LocalHashEmbeddingProvider,
     create_embedding_provider,
 )
-from src.razor_recover.brains.rag.exceptions import (
+from razor_recover.brains.rag.exceptions import (
     CollectionNotFoundError,
     DocumentError,
     EmbeddingError,
     RetrieverError,
 )
-from src.razor_recover.brains.rag.knowledge_base import (
+from razor_recover.brains.rag.knowledge_base import (
     DEMO_KNOWLEDGE_DOCUMENTS,
     load_documents,
 )
-from src.razor_recover.brains.rag.retriever import Retriever, format_result
-from src.razor_recover.brains.rag.schemas import KnowledgeDocument, RetrievalResult
-from src.razor_recover.brains.rag.seeder import seed_knowledge_base
-from src.razor_recover.brains.rag.service import RAGService
-from src.razor_recover.brains.rag.vector_store import (
+from razor_recover.brains.rag.retriever import Retriever, format_result
+from razor_recover.brains.rag.schemas import KnowledgeDocument, RetrievalResult
+from razor_recover.brains.rag.seeder import seed_knowledge_base
+from razor_recover.brains.rag.service import RAGService
+from razor_recover.brains.rag.vector_store import (
     InMemoryVectorStore,
     VectorPoint,
 )

@@ -6,7 +6,7 @@ from decimal import Decimal
 import pytest
 from sqlalchemy import inspect, text
 
-from src.razor_recover.config import get_settings
+from razor_recover.config import get_settings
 
 EXPECTED_TABLES = {
     "alembic_version",
@@ -43,9 +43,9 @@ def test_alembic_version_is_at_head(postgres_engine):
 
 
 def test_crud_round_trip_on_postgres(postgres_session):
-    from src.razor_recover.db.models.customer import Customer
-    from src.razor_recover.db.models.merchant import Merchant
-    from src.razor_recover.db.models.transaction import Transaction
+    from razor_recover.db.models.customer import Customer
+    from razor_recover.db.models.merchant import Merchant
+    from razor_recover.db.models.transaction import Transaction
 
     suffix = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S%f")
     merchant = Merchant(external_id=f"int-merchant-{suffix}", name="Integration Merchant")

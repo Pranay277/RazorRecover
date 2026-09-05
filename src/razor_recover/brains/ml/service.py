@@ -13,21 +13,21 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
-from src.razor_recover.brains.ml import features
-from src.razor_recover.brains.ml.model_base import (
+from razor_recover.brains.ml import features
+from razor_recover.brains.ml.model_base import (
     MLModelError,
     ModelArtifactError,
     RecoveryPrediction,
     RiskPrediction,
 )
-from src.razor_recover.brains.ml.recovery_model import RecoveryModel
-from src.razor_recover.brains.ml.risk_model import RiskModel
-from src.razor_recover.brains.ml.training import (
+from razor_recover.brains.ml.recovery_model import RecoveryModel
+from razor_recover.brains.ml.risk_model import RiskModel
+from razor_recover.brains.ml.training import (
     DEFAULT_ARTIFACT_DIR,
     RECOVERY_ARTIFACT_NAME,
     RISK_ARTIFACT_NAME,
 )
-from src.razor_recover.core.logger import get_logger
+from razor_recover.core.logger import get_logger
 
 logger = get_logger("brains.ml.service")
 

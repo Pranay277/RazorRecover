@@ -16,7 +16,7 @@ import argparse
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -58,9 +58,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
 
-    from src.razor_recover.core.database import SessionLocal
-    from src.razor_recover.core.logger import get_logger
-    from src.razor_recover.synthetic import (
+    from razor_recover.core.database import SessionLocal
+    from razor_recover.core.logger import get_logger
+    from razor_recover.synthetic import (
         SyntheticDataConfig,
         generate_dataset,
         write_dataset,

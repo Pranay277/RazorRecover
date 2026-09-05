@@ -9,13 +9,13 @@ from __future__ import annotations
 
 import logging
 
-from src.razor_recover.brains.rag.chunking import DEFAULT_MAX_CHARS, chunk_document
-from src.razor_recover.brains.rag.embeddings import EmbeddingProvider
-from src.razor_recover.brains.rag.exceptions import DocumentError, VectorStoreError
-from src.razor_recover.brains.rag.knowledge_base import load_documents
-from src.razor_recover.brains.rag.schemas import KnowledgeDocument
-from src.razor_recover.brains.rag.vector_store import VectorPoint, VectorStore
-from src.razor_recover.core.logger import get_logger
+from razor_recover.brains.rag.chunking import DEFAULT_MAX_CHARS, chunk_document
+from razor_recover.brains.rag.embeddings import EmbeddingProvider
+from razor_recover.brains.rag.exceptions import DocumentError, VectorStoreError
+from razor_recover.brains.rag.knowledge_base import load_documents
+from razor_recover.brains.rag.schemas import KnowledgeDocument
+from razor_recover.brains.rag.vector_store import VectorPoint, VectorStore
+from razor_recover.core.logger import get_logger
 
 logger: logging.Logger = get_logger("brains.rag.seeder")
 

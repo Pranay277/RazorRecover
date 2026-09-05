@@ -4,20 +4,39 @@ import { API_BASE_URL } from '@/api';
 
 import styles from './Header.module.css';
 
-const TITLE_BY_PATH: Array<[RegExp, string]> = [
-  [/^\/transactions\/\d+\/?$/, 'Transaction Details'],
-  [/^\/transactions/, 'Transactions'],
-  [/^\/audit/, 'Audit Logs'],
-  [/^\//, 'Overview'],
+interface HeaderMeta {
+  title: string;
+  subtitle?: string;
+}
+
+const META_BY_PATH: Array<[RegExp, HeaderMeta]> = [
+  [
+    /^\/$/,
+    {
+      title: 'Recovery Command Center',
+      subtitle: 'Monitor failed payments and recovery decisions',
+    },
+  ],
+  [/^\/transaction-details\/?$/, { title: 'Transaction Details' }],
+  [/^\/transactions\/\d+\/?$/, { title: 'Transaction Details' }],
+  [
+    /^\/transactions/,
+    {
+      title: 'Transactions',
+      subtitle: 'Investigate payment failures and recovery decisions',
+    },
+  ],
+  [/^\/audit/, { title: 'Audit logs' }],
+  [/^\//, { title: 'RazorRecover' }],
 ];
 
-function titleFor(pathname: string): string {
-  for (const [pattern, title] of TITLE_BY_PATH) {
+function metaFor(pathname: string): HeaderMeta {
+  for (const [pattern, meta] of META_BY_PATH) {
     if (pattern.test(pathname)) {
-      return title;
+      return meta;
     }
   }
-  return 'RazorRecover';
+  return { title: 'RazorRecover' };
 }
 
 function apiHost(): string {
@@ -30,9 +49,13 @@ function apiHost(): string {
 
 export function Header() {
   const { pathname } = useLocation();
+  const { title, subtitle } = metaFor(pathname);
   return (
     <header className={styles.header}>
-      <h1 className={styles.title}>{titleFor(pathname)}</h1>
+      <div className={styles.heading}>
+        <h1 className={styles.title}>{title}</h1>
+        {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+      </div>
       <span className={styles.badge} title="Backend API base URL">
         API · {apiHost()}
       </span>

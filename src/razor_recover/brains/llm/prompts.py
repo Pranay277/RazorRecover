@@ -9,7 +9,7 @@ rules.
 
 from __future__ import annotations
 
-from src.razor_recover.brains.llm.schemas import (
+from razor_recover.brains.llm.schemas import (
     AllowedAction,
     DecisionRequest,
 )

@@ -11,8 +11,8 @@ metadata (source/category/scope) alongside content.
 
 from __future__ import annotations
 
-from src.razor_recover.brains.rag.exceptions import DocumentError
-from src.razor_recover.brains.rag.schemas import KnowledgeDocument
+from razor_recover.brains.rag.exceptions import DocumentError
+from razor_recover.brains.rag.schemas import KnowledgeDocument
 
 # Explicit, machine-readable marker used in every document.
 DEMO_DISCLAIMER = (

@@ -5,7 +5,7 @@ Input : feature vector built from evaluation-time information (see
 a loss (not recovered).
 """
 
-from src.razor_recover.brains.ml.model_base import BaseScoringModel, RiskPrediction
+from razor_recover.brains.ml.model_base import BaseScoringModel, RiskPrediction
 
 
 class RiskModel(BaseScoringModel):

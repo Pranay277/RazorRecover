@@ -1,14 +1,14 @@
 """ML layer - risk & recovery prediction models."""
 
-from src.razor_recover.brains.ml.model_base import (
+from razor_recover.brains.ml.model_base import (
     MLModelError,
     MissingFeatureError,
     ModelArtifactError,
     RecoveryPrediction,
     RiskPrediction,
 )
-from src.razor_recover.brains.ml.recovery_model import RecoveryModel
-from src.razor_recover.brains.ml.risk_model import RiskModel
+from razor_recover.brains.ml.recovery_model import RecoveryModel
+from razor_recover.brains.ml.risk_model import RiskModel
 
 __all__ = [
     "RiskModel",

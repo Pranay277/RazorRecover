@@ -16,7 +16,7 @@ from enum import Enum
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from src.razor_recover.brains.llm.schemas import (
+from razor_recover.brains.llm.schemas import (
     AgentDecision,
     AllowedAction,
     TransactionSnapshot,

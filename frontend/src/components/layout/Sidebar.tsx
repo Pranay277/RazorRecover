@@ -1,11 +1,59 @@
 import { NavLink } from 'react-router-dom';
+import type { ReactNode } from 'react';
 
 import styles from './Sidebar.module.css';
 
-const NAV_ITEMS = [
-  { to: '/', label: 'Overview', end: true },
-  { to: '/transactions', label: 'Transactions', end: false },
-  { to: '/audit', label: 'Audit Logs', end: false },
+interface NavItem {
+  to: string;
+  label: string;
+  end?: boolean;
+  icon: ReactNode;
+}
+
+function DashboardIcon() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <rect x="1.5" y="1.5" width="5.5" height="5.5" rx="1.5" stroke="currentColor" strokeWidth="1.4" />
+      <rect x="9" y="1.5" width="5.5" height="5.5" rx="1.5" stroke="currentColor" strokeWidth="1.4" />
+      <rect x="1.5" y="9" width="5.5" height="5.5" rx="1.5" stroke="currentColor" strokeWidth="1.4" />
+      <rect x="9" y="9" width="5.5" height="5.5" rx="1.5" stroke="currentColor" strokeWidth="1.4" />
+    </svg>
+  );
+}
+
+function TransactionIcon() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <rect x="1.5" y="2.5" width="13" height="11" rx="2" stroke="currentColor" strokeWidth="1.4" />
+      <path d="M1.5 5.5h13" stroke="currentColor" strokeWidth="1.4" />
+      <path d="M4 12.5v-2M6.5 12.5v-2" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function DetailsIcon() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <rect x="2.5" y="1.5" width="11" height="13" rx="2" stroke="currentColor" strokeWidth="1.4" />
+      <path d="M5 5h6M5 8h6M5 11h3.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function AuditIcon() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M2.5 3.5h11M2.5 7h11M2.5 10.5h7M2.5 14h11" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+      <path d="M4 10.5v3.5M6.5 10.5v3.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+const NAV_ITEMS: NavItem[] = [
+  { to: '/', label: 'Recovery Command Center Refined', end: true, icon: <DashboardIcon /> },
+  { to: '/transactions', label: 'Transactions Investigation', icon: <TransactionIcon /> },
+  { to: '/transaction-details', label: 'Transaction Details', icon: <DetailsIcon /> },
+  { to: '/audit', label: 'Audit logs', icon: <AuditIcon /> },
 ];
 
 export function Sidebar() {
@@ -13,7 +61,7 @@ export function Sidebar() {
     <aside className={styles.sidebar}>
       <div className={styles.brand}>
         <span className={styles.brandName}>RazorRecover</span>
-        <span className={styles.brandSub}>Payment recovery</span>
+        <span className={styles.brandSub}>Merchant Ops</span>
       </div>
       <nav className={styles.nav} aria-label="Main">
         {NAV_ITEMS.map((item) => (
@@ -25,6 +73,7 @@ export function Sidebar() {
               [styles.link, isActive && styles.active].filter(Boolean).join(' ')
             }
           >
+            <span className={styles.icon}>{item.icon}</span>
             {item.label}
           </NavLink>
         ))}

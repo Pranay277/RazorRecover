@@ -3,7 +3,7 @@
 from sqlalchemy import BigInteger, Boolean, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.razor_recover.db.models.base import Base, TimestampMixin
+from razor_recover.db.models.base import Base, TimestampMixin
 
 
 class Policy(TimestampMixin, Base):

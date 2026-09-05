@@ -3,9 +3,9 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from src.razor_recover.api.dependencies import db_session, get_dashboard_read_service
-from src.razor_recover.schemas.dashboard import AuditListResponse
-from src.razor_recover.services.read.dashboard import DashboardReadService
+from razor_recover.api.dependencies import db_session, get_dashboard_read_service
+from razor_recover.schemas.dashboard import AuditListResponse
+from razor_recover.services.read.dashboard import DashboardReadService
 
 router = APIRouter(prefix="/audit", tags=["audit"])
 

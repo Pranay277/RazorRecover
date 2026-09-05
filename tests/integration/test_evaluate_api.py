@@ -17,33 +17,33 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from src.razor_recover.core.database import Base
-from src.razor_recover.api import dependencies
-from src.razor_recover.brains.llm.schemas import AgentDecision, AllowedAction
-from src.razor_recover.brains.ml.service import MLModelUnavailableError
-from src.razor_recover.brains.rag.schemas import RetrievalHit, RetrievalResult
-from src.razor_recover.db.models.audit import AuditLog
-from src.razor_recover.db.models.customer import Customer
-from src.razor_recover.db.models.decision import RecoveryDecision
-from src.razor_recover.db.models.merchant import Merchant
-from src.razor_recover.db.models.recovery import RecoveryAttempt
-from src.razor_recover.db.models.transaction import Transaction
-from src.razor_recover.execution.exceptions import UnauthorizedExecutionError
-from src.razor_recover.execution.gateway import MockPaymentGateway
-from src.razor_recover.execution.recovery_service import RecoveryService
-from src.razor_recover.execution.retry_service import RetryService
-from src.razor_recover.execution.schemas import ExecutionStatus, GatewayOutcome
-from src.razor_recover.main import create_app
-from src.razor_recover.shield.exceptions import PolicyError
-from src.razor_recover.shield.policy_engine import PolicyEngine
-from src.razor_recover.workflow.exceptions import (
+from razor_recover.core.database import Base
+from razor_recover.api import dependencies
+from razor_recover.brains.llm.schemas import AgentDecision, AllowedAction
+from razor_recover.brains.ml.service import MLModelUnavailableError
+from razor_recover.brains.rag.schemas import RetrievalHit, RetrievalResult
+from razor_recover.db.models.audit import AuditLog
+from razor_recover.db.models.customer import Customer
+from razor_recover.db.models.decision import RecoveryDecision
+from razor_recover.db.models.merchant import Merchant
+from razor_recover.db.models.recovery import RecoveryAttempt
+from razor_recover.db.models.transaction import Transaction
+from razor_recover.execution.exceptions import UnauthorizedExecutionError
+from razor_recover.execution.gateway import MockPaymentGateway
+from razor_recover.execution.recovery_service import RecoveryService
+from razor_recover.execution.retry_service import RetryService
+from razor_recover.execution.schemas import ExecutionStatus, GatewayOutcome
+from razor_recover.main import create_app
+from razor_recover.shield.exceptions import PolicyError
+from razor_recover.shield.policy_engine import PolicyEngine
+from razor_recover.workflow.exceptions import (
     LLMStageError,
     MLStageError,
     PolicyStageError,
     TransactionNotFoundError,
 )
-from src.razor_recover.workflow.orchestrator import RecoveryOrchestrator
-from src.razor_recover.workflow.policy import DefaultMerchantPolicyProvider
+from razor_recover.workflow.orchestrator import RecoveryOrchestrator
+from razor_recover.workflow.policy import DefaultMerchantPolicyProvider
 
 
 # ---------------------------------------------------------------------------
@@ -243,7 +243,7 @@ def test_gateway_timeout_records_timeout(sqlite_session):
 
 def test_llm_failure_no_execution(sqlite_session):
     tx = _seed_transaction(sqlite_session)
-    from src.razor_recover.brains.llm.exceptions import LLMProviderUnavailableError
+    from razor_recover.brains.llm.exceptions import LLMProviderUnavailableError
     fake = FakeAgent(error=LLMProviderUnavailableError("offline"))
     orch, gw = _build_orchestrator(sqlite_session, agent=fake)
     with pytest.raises(LLMStageError):
@@ -315,7 +315,7 @@ def test_execution_cannot_bypass_policy_decision(sqlite_session):
     tx = _seed_transaction(sqlite_session)
     gw = MockPaymentGateway()
     recovery = RecoveryService(retry_service=RetryService(gateway=gw))
-    from src.razor_recover.shield.schemas import PolicyDecision, PolicyDecisionType
+    from razor_recover.shield.schemas import PolicyDecision, PolicyDecisionType
     blocked = PolicyDecision(decision=PolicyDecisionType.BLOCK,
                              requested_action="RETRY_NOW", final_action=None)
     with pytest.raises(UnauthorizedExecutionError):
@@ -398,7 +398,7 @@ def test_api_block_never_executes(api):
 def test_api_llm_failure_returns_503(api):
     session = api._session  # type: ignore[attr-defined]
     tx = _seed_transaction(session)
-    from src.razor_recover.brains.llm.exceptions import LLMProviderUnavailableError
+    from razor_recover.brains.llm.exceptions import LLMProviderUnavailableError
     api._orchestrator.agent_service = FakeAgent(error=LLMProviderUnavailableError("down"))  # type: ignore[attr-defined]
     resp = api.post("/api/v1/recovery/evaluate", json={"transaction_id": tx.id})
     assert resp.status_code == 503

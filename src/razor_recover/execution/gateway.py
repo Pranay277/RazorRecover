@@ -12,8 +12,8 @@ from __future__ import annotations
 import logging
 from typing import Protocol
 
-from src.razor_recover.core.logger import get_logger
-from src.razor_recover.execution.schemas import GatewayChargeResult, GatewayOutcome
+from razor_recover.core.logger import get_logger
+from razor_recover.execution.schemas import GatewayChargeResult, GatewayOutcome
 
 logger = get_logger("execution.gateway")
 

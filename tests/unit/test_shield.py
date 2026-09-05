@@ -9,14 +9,14 @@ import copy
 
 import pytest
 
-from src.razor_recover.brains.llm.schemas import (
+from razor_recover.brains.llm.schemas import (
     AgentDecision,
     AllowedAction,
     TransactionSnapshot,
 )
-from src.razor_recover.shield.policy_engine import PolicyEngine
-from src.razor_recover.shield.rules import PolicyRule
-from src.razor_recover.shield.schemas import (
+from razor_recover.shield.policy_engine import PolicyEngine
+from razor_recover.shield.rules import PolicyRule
+from razor_recover.shield.schemas import (
     EvaluationContext,
     MerchantPolicy,
     PolicyDecision,
@@ -25,7 +25,7 @@ from src.razor_recover.shield.schemas import (
     RuleResult,
     ShieldConfig,
 )
-from src.razor_recover.shield.exceptions import (
+from razor_recover.shield.exceptions import (
     InvalidPolicyContextError,
     PolicyEvaluationError,
     UnknownRuleError,

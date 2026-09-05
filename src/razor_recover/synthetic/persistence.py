@@ -8,13 +8,13 @@ introduced, and generation logic is not duplicated here.
 
 from sqlalchemy.orm import Session
 
-from src.razor_recover.core.logger import get_logger
-from src.razor_recover.db.models.customer import Customer
-from src.razor_recover.db.models.decision import RecoveryDecision
-from src.razor_recover.db.models.merchant import Merchant
-from src.razor_recover.db.models.recovery import RecoveryAttempt
-from src.razor_recover.db.models.transaction import Transaction
-from src.razor_recover.synthetic.schemas import SyntheticDataset
+from razor_recover.core.logger import get_logger
+from razor_recover.db.models.customer import Customer
+from razor_recover.db.models.decision import RecoveryDecision
+from razor_recover.db.models.merchant import Merchant
+from razor_recover.db.models.recovery import RecoveryAttempt
+from razor_recover.db.models.transaction import Transaction
+from razor_recover.synthetic.schemas import SyntheticDataset
 
 logger = get_logger("synthetic.persistence")
 

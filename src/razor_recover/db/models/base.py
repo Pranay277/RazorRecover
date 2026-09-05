@@ -5,7 +5,7 @@ from datetime import datetime
 from sqlalchemy import DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from src.razor_recover.core.database import Base
+from razor_recover.core.database import Base
 
 
 class TimestampMixin:
