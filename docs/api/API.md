@@ -214,6 +214,7 @@ Response fields:
 | `recovery_decisions_by_outcome` | `{authorized/blocked/review → count}` |
 | `recovery_decisions_by_action` | `{action → count}` |
 | `recovery_decisions_by_risk_bucket` | `{low/medium/high/unknown → count}` (low < 0.33, medium < 0.66, high ≥ 0.66, unknown = null) |
+| `recovery_decisions_by_probability_bucket` | `{0-20/20-40/40-60/60-80/80-100/unknown → count}` over `recovery_probability` for evaluated decisions (aggregated from the persisted `recovery.evaluate:*` audit detail; inclusive lower bound). In the demo dataset there is one evaluated decision per transaction, so the bucket sums to `recovery_decisions_total`. |
 | `failed_amount` / `recovered_amount` / `total_amount` | Monetary aggregates as strings (precision preserved) |
 
 ## Audit trail

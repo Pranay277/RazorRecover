@@ -5,10 +5,14 @@ All notable changes to RazorRecover are documented in this file.
 ## [Unreleased]
 
 ### Added
-- **Audit Logs frontend screen (in progress)**: audit data hook and filter constants added; routed screen pending integration with the existing `/audit` placeholder route.
+- **Audit Logs frontend screen**: implemented, routed at `/audit`, and backed by the `/api/v1/audit` read API — a paginated, transaction-filterable audit trail of every recovery decision.
+- **Asynchronous recovery evaluation**: Redis + Celery path behind `POST /api/v1/recovery/evaluate/async` and `GET /api/v1/recovery/tasks/{task_id}`, with a "Evaluate Recovery" trigger on the transaction detail screen.
+- **Aggregate recovery-probability buckets**: `recovery_decisions_by_probability_bucket` on the dashboard summary, aggregated from persisted `recovery.evaluate:*` audit detail.
 
 ### Changed
 - Frontend shared status maps gained an `executionStatusBadge` mapper for audit/execution payload values.
+- Sidebar navigation: "Transaction Details" now routes to `/transactions/{id}` instead of a separate placeholder route.
+- CI workflow replaced with a real pipeline that runs the backend test suite and frontend typecheck/build; the placeholder deploy workflow and placeholder `Makefile`/`Dockerfile` scaffolding were removed.
 
 ## [0.1.0] - 2026-09-05
 

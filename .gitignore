@@ -71,7 +71,7 @@ Thumbs.db
 Desktop.ini
 
 # ------------------------- Docker local data --------------------------------
-# Local Docker volumes/data created inside the repository (keep compose/Dockerfile)
+# Local Docker volumes/data created inside the repository (keep compose file)
 docker-data/
 *.sqlite3
 *.db
