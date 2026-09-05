@@ -107,3 +107,12 @@ export function humanizeAction(action: string | null | undefined): string {
   }
   return ACTION_LABELS[action] ?? action.replace(/_/g, ' ');
 }
+
+/** Snake/code identifiers to display labels, e.g. "risk_threshold" → "Risk threshold". */
+export function humanizeLabel(value: string | null | undefined): string {
+  if (!value) {
+    return '—';
+  }
+  const spaced = value.replace(/_/g, ' ');
+  return spaced.charAt(0).toUpperCase() + spaced.slice(1);
+}

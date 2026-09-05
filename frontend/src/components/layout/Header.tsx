@@ -18,7 +18,13 @@ const META_BY_PATH: Array<[RegExp, HeaderMeta]> = [
     },
   ],
   [/^\/transaction-details\/?$/, { title: 'Transaction Details' }],
-  [/^\/transactions\/\d+\/?$/, { title: 'Transaction Details' }],
+  [
+    /^\/transactions\/\d+\/?$/,
+    {
+      title: 'Transaction Details',
+      subtitle: 'Investigate payment failure, recovery analysis, and decision history',
+    },
+  ],
   [
     /^\/transactions/,
     {
