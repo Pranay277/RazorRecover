@@ -60,9 +60,9 @@ const NAV_ITEMS: NavItem[] = [
     icon: <TransactionIcon />,
   },
   {
-    to: '/transaction-details',
+    to: '/transactions',
     label: 'Transaction Details',
-    match: /^(\/transaction-details\/?|\/transactions\/\d+\/?)$/,
+    match: /^\/transactions\/\d+\/?$/,
     icon: <DetailsIcon />,
   },
   { to: '/audit', label: 'Audit logs', icon: <AuditIcon /> },
@@ -89,7 +89,7 @@ export function Sidebar() {
       <nav className={styles.nav} aria-label="Main">
         {NAV_ITEMS.map((item) => (
           <NavLink
-            key={item.to}
+            key={item.label}
             to={item.to}
             end={item.end}
             className={[

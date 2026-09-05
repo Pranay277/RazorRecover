@@ -3,7 +3,6 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { AppLayout } from '@/components';
 import {
   AuditLogs,
-  PlaceholderPage,
   RecoveryCommandCenter,
   TransactionDetails,
   TransactionsInvestigation,
@@ -15,15 +14,6 @@ export default function App() {
       <Route element={<AppLayout />}>
         <Route index element={<RecoveryCommandCenter />} />
         <Route path="transactions" element={<TransactionsInvestigation />} />
-        <Route
-          path="transaction-details"
-          element={
-            <PlaceholderPage
-              title="Transaction Details"
-              description="The full persisted view of a single transaction will be implemented here."
-            />
-          }
-        />
         <Route path="transactions/:transactionId" element={<TransactionDetails />} />
         <Route path="audit" element={<AuditLogs />} />
         <Route path="*" element={<Navigate to="/" replace />} />

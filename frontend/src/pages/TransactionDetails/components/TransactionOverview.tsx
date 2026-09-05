@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 
 import { StatusBadge } from '@/components';
 import {
@@ -15,9 +15,11 @@ import styles from './TransactionOverview.module.css';
 
 interface TransactionOverviewProps {
   transaction: TransactionDetail;
+  /** Optional action row rendered below the transaction attribution. */
+  action?: ReactNode;
 }
 
-export function TransactionOverview({ transaction }: TransactionOverviewProps) {
+export function TransactionOverview({ transaction, action }: TransactionOverviewProps) {
   const [copied, setCopied] = useState(false);
 
   const copyId = async () => {
@@ -123,6 +125,8 @@ export function TransactionOverview({ transaction }: TransactionOverviewProps) {
           </span>
         </div>
       </div>
+
+      {action && <div className={styles.actionBar}>{action}</div>}
     </SectionCard>
   );
 }

@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 
 from razor_recover.core.database import get_db
 from razor_recover.services.read.dashboard import DashboardReadService
+from razor_recover.tasks.queue import RecoveryTaskQueue
 from razor_recover.workflow.deps import build_orchestrator
 from razor_recover.workflow.orchestrator import RecoveryOrchestrator
 
@@ -36,8 +37,19 @@ def get_dashboard_read_service() -> DashboardReadService:
     return DashboardReadService()
 
 
+@lru_cache
+def _task_queue() -> RecoveryTaskQueue:
+    return RecoveryTaskQueue()
+
+
+def get_recovery_task_queue() -> RecoveryTaskQueue:
+    """Provide the (cached) async recovery task queue adapter."""
+    return _task_queue()
+
+
 __all__ = [
     "db_session",
     "get_recovery_orchestrator",
     "get_dashboard_read_service",
+    "get_recovery_task_queue",
 ]

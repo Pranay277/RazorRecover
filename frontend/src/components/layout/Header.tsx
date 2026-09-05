@@ -17,7 +17,6 @@ const META_BY_PATH: Array<[RegExp, HeaderMeta]> = [
       subtitle: 'Monitor failed payments and recovery decisions',
     },
   ],
-  [/^\/transaction-details\/?$/, { title: 'Transaction Details' }],
   [
     /^\/transactions\/\d+\/?$/,
     {
@@ -29,7 +28,7 @@ const META_BY_PATH: Array<[RegExp, HeaderMeta]> = [
     /^\/transactions/,
     {
       title: 'Transactions',
-      subtitle: 'Investigate payment failures and recovery decisions',
+      subtitle: 'Select a transaction to view its details',
     },
   ],
   [/^\/audit/, { title: 'Audit logs', subtitle: 'Inspect recovery workflow events and decision outcomes' }],
